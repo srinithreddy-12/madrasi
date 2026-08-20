@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { Route } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
 import type { Place } from "@/lib/types";
@@ -129,6 +131,12 @@ export default function ExplorePage() {
         {detail && (
           <>
             <p className="t-stat text-explore">{priceLabel(detail)}</p>
+            <Link
+              href={`/move?to=${encodeURIComponent(detail.area)}`}
+              className="t-subtitle mt-3 flex items-center justify-center gap-2 rounded-full bg-explore-tint py-3 text-explore"
+            >
+              <Route size={18} /> How do I get there?
+            </Link>
             {detail.tags.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {detail.tags.map((t) => (

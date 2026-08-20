@@ -8,6 +8,7 @@ import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
 import { loadProgress, type Progress } from "@/lib/progress";
 import { inr, levelFromXp } from "@/lib/format";
 import { MODULES, MODULE_BY_KEY, type ModuleKey } from "@/lib/modules";
+import type { CollegeLeaderboardRow } from "@/lib/types";
 import { resetDemoData } from "@/lib/demo";
 import { soundEnabled } from "@/lib/voice";
 import { StatTrio } from "@/components/stat-trio";
@@ -35,8 +36,18 @@ export default function ProfilePage() {
   const [hasQuiz, setHasQuiz] = useState(false);
   const [tab, setTab] = useState<SavedTab>("place");
   const [sound, setSound] = useState(true);
+  const [leaderboard, setLeaderboard] = useState<CollegeLeaderboardRow[]>([]);
 
   useEffect(() => setSound(soundEnabled()), []);
+
+  useEffect(() => {
+    supabase
+      .from("weekly_college_leaderboard")
+      .select("*")
+      .order("weekly_xp", { ascending: false })
+      .limit(5)
+      .then(({ data }) => setLeaderboard((data ?? []) as CollegeLeaderboardRow[]));
+  }, []);
 
   useEffect(() => {
     if (!userId) return;
@@ -201,6 +212,35 @@ export default function ProfilePage() {
           )}
         </div>
       </section>
+
+      {/* Weekly college leaderboard */}
+      {leaderboard.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <h2 className="t-title text-ink">Weekly college leaderboard</h2>
+          <div className="flex flex-col gap-2">
+            {leaderboard.map((row, i) => {
+              const mine = row.college_id === profile?.college_id;
+              return (
+                <div
+                  key={row.college_id}
+                  className={`flex items-center justify-between rounded-card border p-4 shadow-card ${
+                    mine ? "border-move bg-move-tint" : "border-line bg-surface"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="t-stat text-muted" style={{ fontSize: "20px" }}>#{i + 1}</span>
+                    <div>
+                      <p className="t-subtitle text-ink">{row.college_name}</p>
+                      <p className="t-micro text-muted">{row.active_students} active this week</p>
+                    </div>
+                  </div>
+                  <span className="t-stat text-move">{row.weekly_xp} XP</span>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Badges */}
       <section className="flex flex-col gap-2">

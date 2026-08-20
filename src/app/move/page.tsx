@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { fairFare } from "@/lib/fare";
 import { inr } from "@/lib/format";
 import { BUS_ROUTES } from "@/lib/bus-routes";
+import { AREAS, resolveArea, roadKm } from "@/lib/areas";
 
 // MOVE (DEMO-SPRINT Block C + reference-app parity): route planner, cost
 // calculator, a "new to Chennai" transit guide, and a bus-route reference.
@@ -21,35 +23,6 @@ const MODES: { key: string; label: string; note: string; fare: (km: number) => n
   { key: "auto", label: "Auto (meter)", note: "if metered", fare: (km) => fairFare(km, 14) },
   { key: "cab", label: "Cab", note: "Ola/Uber", fare: (km) => Math.round(60 + km * 14) },
 ];
-
-// Approximate coordinates for common student areas — enough to rank route
-// options by distance, not to claim GPS accuracy.
-const AREA_COORDS: Record<string, [number, number]> = {
-  "Velachery": [12.9756, 80.2207],
-  "Adyar": [13.0012, 80.2565],
-  "T. Nagar": [13.0418, 80.2341],
-  "Guindy": [13.0067, 80.2206],
-  "Besant Nagar": [13.0002, 80.2669],
-  "Anna Nagar": [13.0850, 80.2101],
-  "Mylapore": [13.0339, 80.2619],
-  "Tambaram": [12.9249, 80.1000],
-  "Egmore": [13.0732, 80.2609],
-  "Chennai Central": [13.0827, 80.2707],
-};
-const AREAS = Object.keys(AREA_COORDS);
-
-function roadKm(from: string, to: string): number {
-  const [lat1, lon1] = AREA_COORDS[from];
-  const [lat2, lon2] = AREA_COORDS[to];
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
-  const straight = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return Math.max(1, Math.round(straight * 1.35)); // roads aren't straight lines
-}
 
 type RouteOption = {
   key: string;
@@ -146,11 +119,33 @@ const GUIDE_CARDS = [
 ];
 
 export default function MovePage() {
+  return (
+    <Suspense fallback={<div className="px-4 py-6 t-body text-muted">Loading…</div>}>
+      <MovePlanner />
+    </Suspense>
+  );
+}
+
+function MovePlanner() {
+  const params = useSearchParams();
   const [from, setFrom] = useState("Velachery");
   const [to, setTo] = useState("Chennai Central");
   const [planned, setPlanned] = useState<{ from: string; to: string } | null>(null);
   const [openRoute, setOpenRoute] = useState<string | null>(null);
   const [openBus, setOpenBus] = useState<string | null>(null);
+
+  // Arriving from a place's "How do I get there?" link (e.g. /move?to=Mylapore):
+  // pre-fill the destination and run the search immediately.
+  useEffect(() => {
+    const toParam = resolveArea(params.get("to"));
+    const fromParam = resolveArea(params.get("from"));
+    if (!toParam) return;
+    const nextFrom = fromParam ?? from;
+    setTo(toParam);
+    if (fromParam) setFrom(fromParam);
+    if (nextFrom !== toParam) setPlanned({ from: nextFrom, to: toParam });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
 
   const options = useMemo(
     () => (planned ? buildRouteOptions(planned.from, planned.to) : []),

@@ -150,4 +150,11 @@ export type Scenario = {
   lines: ScenarioLine[];
 };
 
+export type CollegeLeaderboardRow = {
+  college_id: string;
+  college_name: string;
+  weekly_xp: number;
+  active_students: number;
+};
+
 export const AXES: Axis[] = ["eat", "speak", "move", "live", "explore"];
