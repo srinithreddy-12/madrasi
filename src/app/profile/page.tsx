@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Check, Lock } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
@@ -8,6 +9,8 @@ import { loadProgress, type Progress } from "@/lib/progress";
 import { inr, levelFromXp } from "@/lib/format";
 import { MODULES, MODULE_BY_KEY, type ModuleKey } from "@/lib/modules";
 import { deriveBadges } from "@/lib/badges";
+import { circleId } from "@/lib/circle-id";
+import { AVATAR_EMOJIS, getAvatar, setAvatar as saveAvatar } from "@/lib/avatars";
 import type { CollegeLeaderboardRow } from "@/lib/types";
 import { resetDemoData } from "@/lib/demo";
 import { soundEnabled } from "@/lib/voice";
@@ -21,6 +24,8 @@ const VEG_PREFS: { key: "veg" | "nonveg" | "both"; label: string }[] = [
   { key: "nonveg", label: "Non-veg" },
   { key: "both", label: "Both" },
 ];
+const LEVEL_TITLES = ["Fresher", "Settler", "Local", "Regular", "Veteran", "Legend"];
+const levelTitle = (level: number) => LEVEL_TITLES[Math.min(level - 1, LEVEL_TITLES.length - 1)] ?? LEVEL_TITLES[0];
 
 // Which module colour each derived badge (src/lib/badges.ts) reads on.
 const BADGE_MODULE: Record<string, ModuleKey> = {
@@ -64,8 +69,45 @@ export default function ProfilePage() {
   const [tab, setTab] = useState<SavedTab>("place");
   const [sound, setSound] = useState(true);
   const [leaderboard, setLeaderboard] = useState<CollegeLeaderboardRow[]>([]);
+  const [avatar, setAvatarState] = useState("🎓");
+  const [pickingAvatar, setPickingAvatar] = useState(false);
+  const [accountEmail, setAccountEmail] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
+  const [accountStatus, setAccountStatus] = useState<"idle" | "saving" | "sent" | "error">("idle");
+  const [accountError, setAccountError] = useState("");
 
   useEffect(() => setSound(soundEnabled()), []);
+  useEffect(() => {
+    if (userId) setAvatarState(getAvatar(userId));
+  }, [userId]);
+
+  function pickAvatar(emoji: string) {
+    if (!userId) return;
+    saveAvatar(userId, emoji);
+    setAvatarState(emoji);
+    setPickingAvatar(false);
+  }
+
+  async function saveAccount() {
+    if (!accountEmail || accountPassword.length < 6) {
+      setAccountStatus("error");
+      setAccountError("Enter an email and a password of at least 6 characters.");
+      return;
+    }
+    setAccountStatus("saving");
+    const { error } = await supabase.auth.updateUser({ email: accountEmail, password: accountPassword });
+    if (error) {
+      setAccountStatus("error");
+      setAccountError(error.message);
+      return;
+    }
+    setAccountStatus("sent");
+  }
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  }
 
   useEffect(() => {
     supabase
@@ -127,6 +169,10 @@ export default function ProfilePage() {
   const streak = profile?.streak ?? 0;
   const badges = deriveBadges({ axes, savings: savingsTotal, streak });
   const savedCount = savedRows.food.length + savedRows.place.length + savedRows.phrase.length;
+  const isAnon = session?.user.is_anonymous ?? true;
+  const memberSince = profile?.created_at
+    ? new Date(profile.created_at).toLocaleDateString("en-IN", { month: "short", year: "numeric" })
+    : null;
 
   return (
     <div className="screen gap-4">
@@ -134,6 +180,40 @@ export default function ProfilePage() {
 
       {/* Editable identity */}
       <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-card shadow-card">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setPickingAvatar((v) => !v)}
+            aria-label="Change avatar"
+            className="pressable flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-speak text-3xl shadow-card"
+          >
+            {avatar}
+          </button>
+          <div className="min-w-0">
+            <p className="t-micro text-muted">CIRCLE ID · {userId ? circleId(userId) : "—"}</p>
+            <p className="t-label text-muted">
+              Level {level} · {levelTitle(level)}
+              {memberSince && ` · Since ${memberSince}`}
+            </p>
+          </div>
+        </div>
+        {pickingAvatar && (
+          <div className="flex flex-wrap gap-2 rounded-inner bg-bg p-3">
+            {AVATAR_EMOJIS.map((e) => (
+              <button
+                key={e}
+                type="button"
+                onClick={() => pickAvatar(e)}
+                aria-pressed={e === avatar}
+                className={`flex h-10 w-10 items-center justify-center rounded-full text-xl ${
+                  e === avatar ? "bg-speak-tint ring-2 ring-speak" : "bg-surface"
+                }`}
+              >
+                {e}
+              </button>
+            ))}
+          </div>
+        )}
         <label className="flex flex-col gap-1">
           <span className="t-micro text-muted">Name</span>
           <input
@@ -348,6 +428,64 @@ export default function ProfilePage() {
             );
           })}
         </div>
+      </section>
+
+      {/* Account */}
+      <section className="flex flex-col gap-2">
+        <h2 className="t-title text-ink">Account</h2>
+        {isAnon ? (
+          <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-card shadow-card">
+            <p className="t-body text-ink">
+              You&apos;re playing as a guest. Save your progress to an email + password so it survives a reinstall
+              or a new device — your XP, badges and saves stay exactly as they are.
+            </p>
+            {accountStatus === "sent" ? (
+              <p className="t-label text-live">Check {accountEmail} for a confirmation link, then you&apos;re set.</p>
+            ) : (
+              <>
+                <label className="flex flex-col gap-1">
+                  <span className="t-micro text-muted">Email</span>
+                  <input
+                    type="email"
+                    value={accountEmail}
+                    onChange={(e) => setAccountEmail(e.target.value)}
+                    placeholder="you@college.edu"
+                    className="t-body rounded-inner border border-line bg-bg px-3 py-2 text-ink focus:outline-none"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="t-micro text-muted">Password</span>
+                  <input
+                    type="password"
+                    value={accountPassword}
+                    onChange={(e) => setAccountPassword(e.target.value)}
+                    placeholder="At least 6 characters"
+                    className="t-body rounded-inner border border-line bg-bg px-3 py-2 text-ink focus:outline-none"
+                  />
+                </label>
+                {accountStatus === "error" && <p className="t-label text-live">{accountError}</p>}
+                <button
+                  onClick={saveAccount}
+                  disabled={accountStatus === "saving"}
+                  className="t-subtitle rounded-full bg-speak py-3 text-white disabled:opacity-60"
+                >
+                  {accountStatus === "saving" ? "Saving…" : "Save my account"}
+                </button>
+              </>
+            )}
+            <Link href="/login" className="t-micro text-center text-muted">
+              Already have a Circle account? Sign in
+            </Link>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between rounded-card border border-line bg-surface p-4 shadow-card">
+            <div>
+              <p className="t-micro text-muted">Signed in as</p>
+              <p className="t-subtitle text-ink">{session?.user.email}</p>
+            </div>
+            <button onClick={signOut} className="t-label text-live">Sign out</button>
+          </div>
+        )}
       </section>
 
       {/* Settings */}

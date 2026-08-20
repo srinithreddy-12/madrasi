@@ -20,7 +20,7 @@ export async function loadProgress(userId: string): Promise<Progress> {
     supabase
       .from("profiles")
       .select(
-        "id, display_name, college_id, area, home_state, veg_pref, streak, last_active_date, freezes_available",
+        "id, display_name, college_id, area, home_state, veg_pref, streak, last_active_date, freezes_available, created_at",
       )
       .eq("id", userId)
       .maybeSingle(),

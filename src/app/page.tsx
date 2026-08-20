@@ -9,6 +9,7 @@ import { loadProgress, type Progress } from "@/lib/progress";
 import { MODULES } from "@/lib/modules";
 import { inr, levelFromXp } from "@/lib/format";
 import type { Bundle, FoodPlace } from "@/lib/types";
+import { getAvatar } from "@/lib/avatars";
 import { GreetingRow } from "@/components/greeting-row";
 import { StatTrio } from "@/components/stat-trio";
 import { ModuleTile } from "@/components/module-tile";
@@ -71,6 +72,7 @@ export default function HomePage() {
     <div className="screen gap-2">
       <GreetingRow
         name={name}
+        avatar={userId ? getAvatar(userId) : undefined}
         right={
           <Link href="/profile" className="t-chip flex h-9 items-center gap-1 rounded-full bg-speak px-4 text-white">
             Profile <ArrowRight size={14} />

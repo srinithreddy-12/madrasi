@@ -87,6 +87,7 @@ export type Profile = {
   streak: number;
   last_active_date: string | null;
   freezes_available: number;
+  created_at: string;
 };
 
 export type QuestStep = {
