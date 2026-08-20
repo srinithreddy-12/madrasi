@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
@@ -18,25 +18,14 @@ const TABS: Chip[] = [
   { key: "mess", label: "Mess & Tiffin" },
   { key: "late", label: "Late Night" },
 ];
-const SORTS: Chip[] = [
-  { key: "cheapest", label: "Cheapest" },
-  { key: "closest", label: "Closest" },
-  { key: "rated", label: "Top rated" },
-];
 
 const isMess = (p: FoodPlace) => ["mess", "tiffin", "caterer"].includes(p.kind);
 const priceLabel = (p: FoodPlace) =>
   isMess(p) && p.monthly_price ? `${inr(p.monthly_price)}/mo` : `${inr(p.avg_price)}`;
 
-export default function EatPage() {
-  return (
-    <Suspense fallback={<div className="px-4 py-6 t-body text-muted">Loading…</div>}>
-      <EatList />
-    </Suspense>
-  );
-}
-
-function EatList() {
+// Formerly the standalone /eat page — now the default tab inside Services,
+// same as the reference app's Food+Laundry combined /services screen.
+export function EatTab() {
   const params = useSearchParams();
   const { session } = useSupabaseAuth();
   const userId = session?.user.id ?? null;
@@ -46,7 +35,7 @@ function EatList() {
   const [ready, setReady] = useState(false);
 
   const [tab, setTab] = useState("food");
-  const [sort, setSort] = useState("cheapest");
+  const sort = "cheapest";
   const capParam = params.get("cap");
   const [cap, setCap] = useState<number | null>(capParam ? Number(capParam) : null);
   const [detail, setDetail] = useState<FoodPlace | null>(null);
@@ -101,15 +90,8 @@ function EatList() {
   }
 
   return (
-    <div className="flex flex-col gap-3 px-4 py-4">
-      <div>
-        <h1 className="t-hero text-ink">Eat</h1>
-        <p className="t-label text-muted">21G · {ready ? `${list.length} places` : "…"}</p>
-      </div>
-
+    <div className="flex flex-col gap-3">
       <FilterChips chips={TABS} value={tab} onChange={setTab} module={EAT} />
-      <FilterChips chips={SORTS} value={sort} onChange={setSort} module={EAT} />
-
       {cap != null && (
         <button onClick={() => setCap(null)} className="t-chip h-[34px] self-start rounded-full bg-eat px-3.5 text-ink">
           ≤ {inr(cap)} ✕

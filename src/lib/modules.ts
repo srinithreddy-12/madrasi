@@ -34,7 +34,7 @@ export const MODULES: ModuleDef[] = [
     key: "eat",
     label: "Eat",
     routeCode: "21G",
-    path: "/eat",
+    path: "/live?tab=eat",
     icon: Utensils,
     cssVar: "var(--eat)",
     bgClass: "bg-eat",

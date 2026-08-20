@@ -23,10 +23,9 @@ type Place = {
 };
 
 const BLURBS: Record<string, string> = {
-  eat: "Mess, tiffin & late-night eats",
   speak: "Survive Chennai in Tamil",
   move: "Autos, buses & metro — fair fares",
-  live: "Laundry, services & bundles",
+  live: "Food, laundry, housing & bundles",
   explore: "Places, plans & weekend trips",
 };
 
@@ -100,8 +99,8 @@ export default function HomePage() {
         </Link>
       )}
 
-      {/* Five module blocks */}
-      {MODULES.map((m) => (
+      {/* Module blocks — Eat lives inside Services now, no standalone /eat page */}
+      {MODULES.filter((m) => m.key !== "eat").map((m) => (
         <ModuleBlock key={m.key} module={m} blurb={BLURBS[m.key]} progress={`${progress?.axes[m.key] ?? 0}%`} />
       ))}
 
@@ -109,7 +108,7 @@ export default function HomePage() {
       <section className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <h2 className="t-title text-ink">Under ₹100 near you</h2>
-          <Link href="/eat?cap=100" className="t-label text-eat">
+          <Link href="/live?tab=eat&cap=100" className="t-label text-eat">
             See all
           </Link>
         </div>
@@ -117,7 +116,7 @@ export default function HomePage() {
           {cheap.map((f) => (
             <Link
               key={f.id}
-              href="/eat?cap=100"
+              href="/live?tab=eat&cap=100"
               className="flex min-w-[160px] shrink-0 flex-col gap-2 rounded-card border border-line bg-surface p-4 shadow-card"
             >
               <p className="t-subtitle truncate text-ink">{f.name}</p>

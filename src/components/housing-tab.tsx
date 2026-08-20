@@ -53,8 +53,8 @@ export function HousingTab() {
       ))}
 
       <p className="t-micro px-1 text-muted">
-        Ranked by student rating from a crowdsourced list. Prices and amenities for most listings aren&apos;t
-        independently confirmed yet — always call ahead.
+        Ranked by student rating from a crowdsourced list. Street estimates for price and amenities — always
+        confirm with the hostel before paying anything.
       </p>
 
       <DetailSheet open={!!detail} onClose={() => setDetail(null)} module={LIVE} name={detail?.name ?? ""} area={detail?.area ?? ""}>
