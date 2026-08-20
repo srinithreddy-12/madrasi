@@ -1,20 +1,41 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Check, Lock } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
 import { loadProgress, type Progress } from "@/lib/progress";
 import { inr, levelFromXp } from "@/lib/format";
 import { MODULES, MODULE_BY_KEY, type ModuleKey } from "@/lib/modules";
+import { deriveBadges } from "@/lib/badges";
 import type { CollegeLeaderboardRow } from "@/lib/types";
 import { resetDemoData } from "@/lib/demo";
 import { soundEnabled } from "@/lib/voice";
 import { StatTrio } from "@/components/stat-trio";
 import { ProgressRing } from "@/components/progress-ring";
-import { BadgeChip } from "@/components/badge-chip";
 import { NavHeader } from "@/components/nav-header";
 
 const AREAS = ["Velachery", "Adyar", "T. Nagar", "Guindy", "Besant Nagar", "Anna Nagar", "Mylapore", "Tambaram"];
+const VEG_PREFS: { key: "veg" | "nonveg" | "both"; label: string }[] = [
+  { key: "veg", label: "Veg" },
+  { key: "nonveg", label: "Non-veg" },
+  { key: "both", label: "Both" },
+];
+
+// Which module colour each derived badge (src/lib/badges.ts) reads on.
+const BADGE_MODULE: Record<string, ModuleKey> = {
+  issued: "move",
+  mess: "eat",
+  tamil: "speak",
+  meter: "move",
+  k1: "live",
+  run3: "live",
+  foodmap: "eat",
+  fluent: "speak",
+  settled: "live",
+  wander: "explore",
+};
+
 type College = { id: string; name: string };
 type SavedTab = "place" | "food" | "phrase";
 const SAVED_TABS: { key: SavedTab; label: string }[] = [
@@ -23,6 +44,10 @@ const SAVED_TABS: { key: SavedTab; label: string }[] = [
   { key: "phrase", label: "Phrases" },
 ];
 
+type FoodRow = { id: string; name: string; area: string; avg_price: number };
+type PlaceRow = { id: string; name: string; area: string; category: string };
+type PhraseRow = { id: string; en: string; local_text: string };
+
 export default function ProfilePage() {
   const { session } = useSupabaseAuth();
   const userId = session?.user.id ?? null;
@@ -30,9 +55,12 @@ export default function ProfilePage() {
   const [progress, setProgress] = useState<Progress | null>(null);
   const [colleges, setColleges] = useState<College[]>([]);
   const [name, setName] = useState("");
-  const [savedNames, setSavedNames] = useState<Record<SavedTab, string[]>>({ place: [], food: [], phrase: [] });
-  const [savesCount, setSavesCount] = useState(0);
-  const [hasQuiz, setHasQuiz] = useState(false);
+  const [homeState, setHomeState] = useState("");
+  const [savedRows, setSavedRows] = useState<{ food: FoodRow[]; place: PlaceRow[]; phrase: PhraseRow[] }>({
+    food: [],
+    place: [],
+    phrase: [],
+  });
   const [tab, setTab] = useState<SavedTab>("place");
   const [sound, setSound] = useState(true);
   const [leaderboard, setLeaderboard] = useState<CollegeLeaderboardRow[]>([]);
@@ -54,24 +82,22 @@ export default function ProfilePage() {
       const prog = await loadProgress(userId);
       setProgress(prog);
       setName(prog.profile?.display_name ?? "");
+      setHomeState(prog.profile?.home_state ?? "");
 
-      const [collegesRes, savesRes, xpRes] = await Promise.all([
+      const [collegesRes, savesRes] = await Promise.all([
         supabase.from("colleges").select("id, name").order("name"),
         supabase.from("saves").select("entity_type, entity_id").eq("user_id", userId),
-        supabase.from("xp_events").select("source").eq("user_id", userId),
       ]);
       setColleges((collegesRes.data ?? []) as College[]);
-      setHasQuiz(new Set((xpRes.data ?? []).map((r) => r.source)).has("quiz"));
 
       const saves = (savesRes.data ?? []) as { entity_type: string; entity_id: string }[];
-      setSavesCount(saves.length);
       const ids = (t: string) => saves.filter((s) => s.entity_type === t).map((s) => s.entity_id);
-      const [food, places, phrases] = await Promise.all([
-        idsOrEmpty("food_places", "name", ids("food")),
-        idsOrEmpty("places", "name", ids("place")),
-        idsOrEmpty("phrases", "en", ids("phrase")),
+      const [food, place, phrase] = await Promise.all([
+        rowsOrEmpty<FoodRow>("food_places", "id,name,area,avg_price", ids("food")),
+        rowsOrEmpty<PlaceRow>("places", "id,name,area,category", ids("place")),
+        rowsOrEmpty<PhraseRow>("phrases", "id,en,local_text", ids("phrase")),
       ]);
-      setSavedNames({ food, place: places, phrase: phrases });
+      setSavedRows({ food, place, phrase });
     })();
   }, [userId]);
 
@@ -99,15 +125,8 @@ export default function ProfilePage() {
   const { axes, totalXp, savingsTotal, profile } = progress;
   const level = levelFromXp(totalXp);
   const streak = profile?.streak ?? 0;
-
-  const badges: { label: string; ok: boolean; module: ModuleKey }[] = [
-    { label: "First words", ok: axes.speak > 0, module: "speak" },
-    { label: "First save", ok: savesCount > 0, module: "eat" },
-    { label: "Quiz taken", ok: hasQuiz, module: "speak" },
-    { label: "3-day streak", ok: streak >= 3, module: "live" },
-    { label: "Level 2", ok: level >= 2, module: "move" },
-    { label: "Explorer", ok: axes.explore > 0, module: "explore" },
-  ];
+  const badges = deriveBadges({ axes, savings: savingsTotal, streak });
+  const savedCount = savedRows.food.length + savedRows.place.length + savedRows.phrase.length;
 
   return (
     <div className="flex flex-col gap-4 px-4 py-4">
@@ -138,6 +157,16 @@ export default function ProfilePage() {
             ))}
           </select>
         </label>
+        <label className="flex flex-col gap-1">
+          <span className="t-micro text-muted">Home state</span>
+          <input
+            value={homeState}
+            onChange={(e) => setHomeState(e.target.value)}
+            onBlur={() => homeState !== (profile?.home_state ?? "") && updateProfile({ home_state: homeState || null })}
+            placeholder="e.g. Kerala, Karnataka"
+            className="t-body rounded-inner border border-line bg-bg px-3 py-2 text-ink focus:outline-none"
+          />
+        </label>
         <div className="flex flex-col gap-1">
           <span className="t-micro text-muted">Area</span>
           <div className="flex flex-wrap gap-2">
@@ -155,6 +184,23 @@ export default function ProfilePage() {
             ))}
           </div>
         </div>
+        <div className="flex flex-col gap-1">
+          <span className="t-micro text-muted">Food preference</span>
+          <div className="flex flex-wrap gap-2">
+            {VEG_PREFS.map((v) => (
+              <button
+                key={v.key}
+                onClick={() => updateProfile({ veg_pref: v.key })}
+                aria-pressed={profile?.veg_pref === v.key}
+                className={`t-chip h-[34px] rounded-full border px-3.5 ${
+                  profile?.veg_pref === v.key ? "border-transparent bg-eat text-ink" : "border-line text-ink"
+                }`}
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Stats + rings */}
@@ -163,6 +209,7 @@ export default function ProfilePage() {
           { value: level, label: "Level" },
           { value: totalXp, label: "XP" },
           { value: streak, label: "Day streak" },
+          { value: profile?.freezes_available ?? 0, label: "Streak freezes" },
         ]}
       />
       <div className="rounded-card border border-line bg-surface p-5 shadow-card">
@@ -182,7 +229,10 @@ export default function ProfilePage() {
 
       {/* Saved items */}
       <section className="flex flex-col gap-2">
-        <h2 className="t-title text-ink">Saved</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="t-title text-ink">Saved</h2>
+          <span className="t-micro text-muted">{savedCount} total</span>
+        </div>
         <div className="flex gap-2">
           {SAVED_TABS.map((t) => (
             <button
@@ -193,20 +243,50 @@ export default function ProfilePage() {
                 tab === t.key ? "border-transparent bg-speak text-white" : "border-line text-ink"
               }`}
             >
-              {t.label}
+              {t.label} ({savedRows[t.key].length})
             </button>
           ))}
         </div>
         <div className="flex flex-col gap-2">
-          {savedNames[tab].length === 0 ? (
-            <p className="t-body text-muted">Nothing saved here yet.</p>
-          ) : (
-            savedNames[tab].map((n, i) => (
-              <div key={`${n}-${i}`} className="rounded-card border border-line bg-surface p-4 shadow-card">
-                <p className="t-subtitle text-ink">{n}</p>
-              </div>
-            ))
-          )}
+          {tab === "place" &&
+            (savedRows.place.length === 0 ? (
+              <p className="t-body text-muted">Nothing saved here yet.</p>
+            ) : (
+              savedRows.place.map((p) => (
+                <div key={p.id} className="flex items-center justify-between rounded-card border border-line bg-surface p-4 shadow-card">
+                  <div>
+                    <p className="t-subtitle text-ink">{p.name}</p>
+                    <p className="t-label text-muted">{p.area}</p>
+                  </div>
+                  <span className="t-chip rounded-full bg-explore-tint px-2.5 py-1 text-explore">{p.category}</span>
+                </div>
+              ))
+            ))}
+          {tab === "food" &&
+            (savedRows.food.length === 0 ? (
+              <p className="t-body text-muted">Nothing saved here yet.</p>
+            ) : (
+              savedRows.food.map((f) => (
+                <div key={f.id} className="flex items-center justify-between rounded-card border border-line bg-surface p-4 shadow-card">
+                  <div>
+                    <p className="t-subtitle text-ink">{f.name}</p>
+                    <p className="t-label text-muted">{f.area}</p>
+                  </div>
+                  <span className="t-stat text-eat" style={{ fontSize: "16px" }}>{inr(f.avg_price)}</span>
+                </div>
+              ))
+            ))}
+          {tab === "phrase" &&
+            (savedRows.phrase.length === 0 ? (
+              <p className="t-body text-muted">Nothing saved here yet.</p>
+            ) : (
+              savedRows.phrase.map((ph) => (
+                <div key={ph.id} className="rounded-card border border-line bg-surface p-4 shadow-card">
+                  <p className="t-subtitle text-ink">{ph.en}</p>
+                  <p className="t-label text-speak">{ph.local_text}</p>
+                </div>
+              ))
+            ))}
         </div>
       </section>
 
@@ -241,12 +321,30 @@ export default function ProfilePage() {
 
       {/* Badges */}
       <section className="flex flex-col gap-2">
-        <h2 className="t-title text-ink">Badges</h2>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex items-center justify-between">
+          <h2 className="t-title text-ink">Badges</h2>
+          <span className="t-micro text-muted">{badges.filter((b) => b.isEarned).length}/{badges.length} earned</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
           {badges.map((b) => {
-            const m = MODULE_BY_KEY[b.module];
+            const m = MODULE_BY_KEY[BADGE_MODULE[b.id]];
             return (
-              <BadgeChip key={b.label} label={b.label} unlocked={b.ok} fillClass={m.bgClass} onColorClass={m.onColorClass} />
+              <div
+                key={b.id}
+                className={`flex flex-col gap-1 rounded-card border p-3 ${
+                  b.isEarned ? `border-transparent ${m.bgClass}` : "border-line bg-surface"
+                }`}
+              >
+                <div className="flex items-center gap-1.5">
+                  {b.isEarned ? (
+                    <Check size={13} strokeWidth={2.5} className={m.onColorClass} />
+                  ) : (
+                    <Lock size={12} strokeWidth={2.5} className="text-muted" />
+                  )}
+                  <span className={`t-chip ${b.isEarned ? m.onColorClass : "text-ink"}`}>{b.label}</span>
+                </div>
+                {!b.isEarned && <p className="t-micro text-muted">{b.hint}</p>}
+              </div>
             );
           })}
         </div>
@@ -276,8 +374,8 @@ export default function ProfilePage() {
   );
 }
 
-async function idsOrEmpty(table: string, nameCol: string, ids: string[]): Promise<string[]> {
+async function rowsOrEmpty<T>(table: string, cols: string, ids: string[]): Promise<T[]> {
   if (ids.length === 0) return [];
-  const { data } = await supabase.from(table).select(`id, ${nameCol}`).in("id", ids);
-  return ((data ?? []) as unknown as Record<string, string>[]).map((r) => r[nameCol]);
+  const { data } = await supabase.from(table).select(cols).in("id", ids);
+  return (data ?? []) as T[];
 }
