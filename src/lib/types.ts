@@ -61,6 +61,20 @@ export type Place = {
   tags: string[];
 };
 
+export type Bundle = {
+  id: string;
+  name: string;
+  tagline: string;
+  category: string;
+  price: number;
+  mrp: number;
+  commission_pct: number;
+  items: string[];
+  seller: string;
+  ships_in: string;
+  popular: boolean;
+};
+
 export type AxisTotal = { axis: Axis; total: number }; // total capped 0..100 by the view
 
 export type Profile = {
@@ -97,6 +111,43 @@ export type PriceConfidence = {
   confirmed_at: string;
   days_old: number;
   is_fresh: boolean;
+};
+
+export type Phrase = {
+  id: string;
+  en: string;
+  local_text: string; // Tamil script (source field `ta`)
+  pron: string;
+  casual: string | null;
+  situation: string;
+};
+
+export type Lesson = {
+  id: string;
+  title: string;
+  emoji: string | null;
+  xp: number;
+  phrase_ids: string[];
+};
+
+export type ScenarioLine = {
+  who: "you" | "them";
+  role: string;
+  ta: string;
+  en: string;
+  pron: string;
+  voice: "male" | "female" | "elder";
+};
+
+export type Scenario = {
+  id: string;
+  title: string;
+  emoji: string | null;
+  place: string | null;
+  vibe: string | null;
+  ambience: string | null;
+  tip: string | null;
+  lines: ScenarioLine[];
 };
 
 export const AXES: Axis[] = ["eat", "speak", "move", "live", "explore"];

@@ -27,6 +27,21 @@ const DEMO_SAVINGS = [
   { entity_type: "laundry", entity_id: "sparkle", amount_saved: 300, baseline_source: "retail laundry", note: "Monthly bundle rate" },
 ];
 
+/** Wipe the current user's progression so the demo can be re-run from zero. */
+export async function resetDemoData(userId: string): Promise<void> {
+  await Promise.all([
+    supabase.from("xp_events").delete().eq("user_id", userId),
+    supabase.from("savings_ledger").delete().eq("user_id", userId),
+    supabase.from("saves").delete().eq("user_id", userId),
+    supabase.from("quest_progress").delete().eq("user_id", userId),
+    supabase.from("price_reports").delete().eq("user_id", userId),
+  ]);
+  await supabase
+    .from("profiles")
+    .update({ streak: 0, last_active_date: null })
+    .eq("id", userId);
+}
+
 /**
  * Populate the current anonymous account with a legible demo pass, once.
  * Idempotent: bails if the user already has any XP. Returns true if it seeded.

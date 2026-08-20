@@ -10,6 +10,7 @@ import {
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./client";
 import { demoSeedEnabled, seedDemoIfNeeded } from "../demo";
+import { dailyLogin } from "../xp";
 
 type SupabaseAuthState = {
   /** Current auth session, or null while it is being established. */
@@ -72,6 +73,16 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
           await seedDemoIfNeeded(resolved.user.id);
         } catch (e) {
           console.error("[demo] seed threw:", e);
+        }
+      }
+
+      // Daily login (+10 XP, streak) — idempotent per day; runs before screens
+      // fetch so the numbers are already current.
+      if (resolved) {
+        try {
+          await dailyLogin(resolved.user.id);
+        } catch (e) {
+          console.error("[daily-login] threw:", e);
         }
       }
 
