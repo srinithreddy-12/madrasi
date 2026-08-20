@@ -11,7 +11,7 @@ import { inr, levelFromXp } from "@/lib/format";
 import type { Bundle, FoodPlace } from "@/lib/types";
 import { GreetingRow } from "@/components/greeting-row";
 import { StatTrio } from "@/components/stat-trio";
-import { ModuleBlock } from "@/components/module-block";
+import { ModuleTile } from "@/components/module-tile";
 
 type Place = {
   id: string;
@@ -20,13 +20,6 @@ type Place = {
   entry: number;
   student_score: number;
   category: string;
-};
-
-const BLURBS: Record<string, string> = {
-  speak: "Survive Chennai in Tamil",
-  move: "Autos, buses & metro — fair fares",
-  live: "Food, laundry, housing & medical",
-  explore: "Places, plans & weekend trips",
 };
 
 function quizPlayedToday(): boolean {
@@ -102,10 +95,12 @@ export default function HomePage() {
         </Link>
       )}
 
-      {/* Module blocks — Eat lives inside Services now, no standalone /eat page */}
-      {MODULES.filter((m) => m.key !== "eat").map((m) => (
-        <ModuleBlock key={m.key} module={m} blurb={BLURBS[m.key]} progress={`${progress?.axes[m.key] ?? 0}%`} />
-      ))}
+      {/* Module tiles — Eat lives inside Services now, no standalone /eat page */}
+      <div className="grid grid-cols-2 gap-2">
+        {MODULES.filter((m) => m.key !== "eat").map((m) => (
+          <ModuleTile key={m.key} module={m} progress={`${progress?.axes[m.key] ?? 0}%`} />
+        ))}
+      </div>
 
       {/* Under ₹100 near you */}
       <section className="flex flex-col gap-2">
