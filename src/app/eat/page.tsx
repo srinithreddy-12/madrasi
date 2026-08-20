@@ -2,14 +2,15 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Phone } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
-import type { FoodPlace, PriceConfidence } from "@/lib/types";
+import type { FoodPlace } from "@/lib/types";
 import { MODULE_BY_KEY } from "@/lib/modules";
 import { inr } from "@/lib/format";
+import { awardFirstSaveXp } from "@/lib/xp";
 import { ContentCard } from "@/components/content-card";
 import { FilterChips, type Chip } from "@/components/filter-chips";
+import { DetailSheet } from "@/components/detail-sheet";
 
 const EAT = MODULE_BY_KEY.eat;
 const TABS: Chip[] = [
@@ -17,6 +18,15 @@ const TABS: Chip[] = [
   { key: "mess", label: "Mess & Tiffin" },
   { key: "late", label: "Late Night" },
 ];
+const SORTS: Chip[] = [
+  { key: "cheapest", label: "Cheapest" },
+  { key: "closest", label: "Closest" },
+  { key: "rated", label: "Top rated" },
+];
+
+const isMess = (p: FoodPlace) => ["mess", "tiffin", "caterer"].includes(p.kind);
+const priceLabel = (p: FoodPlace) =>
+  isMess(p) && p.monthly_price ? `${inr(p.monthly_price)}/mo` : `${inr(p.avg_price)}`;
 
 export default function EatPage() {
   return (
@@ -32,29 +42,23 @@ function EatList() {
   const userId = session?.user.id ?? null;
 
   const [places, setPlaces] = useState<FoodPlace[]>([]);
-  const [confidence, setConfidence] = useState<Record<string, PriceConfidence>>({});
   const [saved, setSaved] = useState<Set<string>>(new Set());
   const [ready, setReady] = useState(false);
 
   const [tab, setTab] = useState("food");
-  const [veg, setVeg] = useState(false);
-  const [delivery, setDelivery] = useState(false);
-  const [walkable, setWalkable] = useState(false);
+  const [sort, setSort] = useState("cheapest");
   const capParam = params.get("cap");
   const [cap, setCap] = useState<number | null>(capParam ? Number(capParam) : null);
+  const [detail, setDetail] = useState<FoodPlace | null>(null);
 
   useEffect(() => {
-    (async () => {
-      const [placesRes, confRes] = await Promise.all([
-        supabase.from("food_places").select("*").order("student_score", { ascending: false }),
-        supabase.from("place_price_confidence").select("*").eq("entity_type", "food"),
-      ]);
-      setPlaces((placesRes.data ?? []) as FoodPlace[]);
-      const conf: Record<string, PriceConfidence> = {};
-      for (const c of (confRes.data ?? []) as PriceConfidence[]) conf[c.entity_id] = c;
-      setConfidence(conf);
-      setReady(true);
-    })();
+    supabase
+      .from("food_places")
+      .select("*")
+      .then(({ data }) => {
+        setPlaces((data ?? []) as FoodPlace[]);
+        setReady(true);
+      });
   }, []);
 
   useEffect(() => {
@@ -67,19 +71,19 @@ function EatList() {
       .then(({ data }) => setSaved(new Set((data ?? []).map((r) => r.entity_id))));
   }, [userId]);
 
-  const filtered = useMemo(
-    () =>
-      places.filter((p) => {
-        if (tab === "mess" && !["mess", "tiffin", "caterer"].includes(p.kind)) return false;
-        if (tab === "late" && !p.late_night) return false;
-        if (veg && p.cuisine === "nonveg") return false;
-        if (delivery && !p.delivery) return false;
-        if (walkable && p.distance_km > 2) return false;
-        if (cap != null && p.avg_price > cap) return false;
-        return true;
-      }),
-    [places, tab, veg, delivery, walkable, cap],
-  );
+  const list = useMemo(() => {
+    const filtered = places.filter((p) => {
+      if (tab === "mess" && !isMess(p)) return false;
+      if (tab === "late" && !p.late_night) return false;
+      if (cap != null && p.avg_price > cap) return false;
+      return true;
+    });
+    const sorted = [...filtered];
+    if (sort === "cheapest") sorted.sort((a, b) => a.avg_price - b.avg_price);
+    else if (sort === "closest") sorted.sort((a, b) => a.distance_km - b.distance_km);
+    else sorted.sort((a, b) => b.rating - a.rating);
+    return sorted;
+  }, [places, tab, sort, cap]);
 
   async function toggleSave(id: string) {
     if (!userId) return;
@@ -92,6 +96,7 @@ function EatList() {
       next.add(id);
       setSaved(next);
       await supabase.from("saves").insert({ user_id: userId, entity_type: "food", entity_id: id });
+      await awardFirstSaveXp(userId, "eat");
     }
   }
 
@@ -99,84 +104,89 @@ function EatList() {
     <div className="flex flex-col gap-3 px-4 py-4">
       <div>
         <h1 className="t-hero text-ink">Eat</h1>
-        <p className="t-label text-muted">21G · {ready ? `${filtered.length} places` : "…"}</p>
+        <p className="t-label text-muted">21G · {ready ? `${list.length} places` : "…"}</p>
       </div>
 
       <FilterChips chips={TABS} value={tab} onChange={setTab} module={EAT} />
+      <FilterChips chips={SORTS} value={sort} onChange={setSort} module={EAT} />
 
-      {/* Toggle filters */}
-      <div className="flex flex-wrap gap-2">
-        <ToggleChip label="Veg" on={veg} onToggle={() => setVeg((v) => !v)} />
-        <ToggleChip label="Delivery" on={delivery} onToggle={() => setDelivery((v) => !v)} />
-        <ToggleChip label="Walkable ≤2km" on={walkable} onToggle={() => setWalkable((v) => !v)} />
-        {cap != null && (
-          <button
-            onClick={() => setCap(null)}
-            className="t-chip h-[34px] rounded-full bg-eat px-3.5 text-ink"
-          >
-            ≤ {inr(cap)} ✕
-          </button>
-        )}
-      </div>
+      {cap != null && (
+        <button onClick={() => setCap(null)} className="t-chip h-[34px] self-start rounded-full bg-eat px-3.5 text-ink">
+          ≤ {inr(cap)} ✕
+        </button>
+      )}
 
-      {ready && filtered.length === 0 ? (
+      {ready && list.length === 0 ? (
         <p className="t-body text-muted">Nothing matches those filters.</p>
       ) : (
-        filtered.map((p) => {
-          const conf = confidence[p.id];
-          const fresh = conf?.is_fresh ?? false;
-          return (
-            <ContentCard
-              key={p.id}
-              module="eat"
-              title={p.name}
-              meta={`${p.area} · ${p.timings}`}
-              price={p.avg_price}
-              info={[
-                { label: "Rating", value: `${p.rating}★ · ${p.reviews}` },
-                { label: "Distance", value: `${p.distance_km} km` },
-                { label: "Student", value: `${p.student_score}/100` },
-                { label: "Diet", value: p.cuisine === "both" ? "Veg + Non" : p.cuisine === "veg" ? "Veg" : "Non-veg" },
-              ]}
-              actionLabel={saved.has(p.id) ? "Saved ✓" : "Save"}
-              onAction={() => toggleSave(p.id)}
-            >
-              <div className="mt-3 flex items-center justify-between gap-2">
-                <span className={`t-micro ${fresh ? "text-speak" : "text-muted"}`}>
-                  {conf && fresh
-                    ? conf.days_old <= 0
-                      ? "Price confirmed today"
-                      : `Confirmed ${conf.days_old}d ago`
-                    : "Needs checking"}
-                </span>
-                {p.phone && (
-                  <a href={`tel:${p.phone}`} className="t-chip flex items-center gap-1 rounded-full border border-line px-3 py-1 text-ink">
-                    <Phone size={13} /> Call
-                  </a>
-                )}
-              </div>
-              {p.must_try.length > 0 && (
-                <p className="t-label mt-2 text-muted">Must try: {p.must_try.slice(0, 2).join(", ")}</p>
-              )}
-            </ContentCard>
-          );
-        })
+        list.map((p) => (
+          <ContentCard
+            key={p.id}
+            module="eat"
+            title={p.name}
+            meta={`${p.area} · ${p.timings}`}
+            price={priceLabel(p)}
+            onClick={() => setDetail(p)}
+          >
+            <div className="mt-3 flex items-center gap-3">
+              <VegDot cuisine={p.cuisine} />
+              <span className="t-micro text-muted">Score {p.student_score}</span>
+              {saved.has(p.id) && <span className="t-micro text-eat">Saved</span>}
+            </div>
+          </ContentCard>
+        ))
       )}
+
+      <DetailSheet
+        open={!!detail}
+        onClose={() => setDetail(null)}
+        module={EAT}
+        name={detail?.name ?? ""}
+        area={detail?.area ?? ""}
+        phone={detail?.phone}
+        saved={detail ? saved.has(detail.id) : false}
+        onToggleSave={() => detail && toggleSave(detail.id)}
+      >
+        {detail && (
+          <>
+            <p className="t-stat text-eat">{priceLabel(detail)}</p>
+            {isMess(detail) && detail.monthly_price && (
+              <p className="t-label text-muted">≈ {inr(Math.round(detail.monthly_price / 90))}/meal</p>
+            )}
+            {detail.must_try.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {detail.must_try.map((t) => (
+                  <span key={t} className="t-chip rounded-full bg-eat-tint px-3 py-1 text-ink">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            )}
+            {detail.blurb && <p className="t-body mt-3 text-ink">{detail.blurb}</p>}
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <div className="rounded-inner bg-eat-tint px-3 py-2">
+                <p className="t-micro text-muted">Timings</p>
+                <p className="t-label text-ink">{detail.timings}</p>
+              </div>
+              <div className="rounded-inner bg-eat-tint px-3 py-2">
+                <p className="t-micro text-muted">Rating</p>
+                <p className="t-label text-ink">{detail.rating}★ · {detail.reviews}</p>
+              </div>
+            </div>
+          </>
+        )}
+      </DetailSheet>
     </div>
   );
 }
 
-function ToggleChip({ label, on, onToggle }: { label: string; on: boolean; onToggle: () => void }) {
+function VegDot({ cuisine }: { cuisine: FoodPlace["cuisine"] }) {
+  const label = cuisine === "veg" ? "Vegetarian" : cuisine === "nonveg" ? "Non-vegetarian" : "Veg & non-veg";
+  const color = cuisine === "veg" ? "var(--speak)" : cuisine === "nonveg" ? "var(--live)" : "var(--eat)";
   return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-pressed={on}
-      className={`t-chip h-[34px] whitespace-nowrap rounded-full border px-3.5 ${
-        on ? "border-transparent bg-eat text-ink" : "border-line bg-surface text-ink"
-      }`}
-    >
+    <span className="t-micro flex items-center gap-1.5 text-muted">
+      <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
       {label}
-    </button>
+    </span>
   );
 }

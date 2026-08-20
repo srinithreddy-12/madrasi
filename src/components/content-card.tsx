@@ -4,32 +4,32 @@ import { MODULE_BY_KEY, type ModuleKey } from "@/lib/modules";
 export type InfoItem = { label: string; value: string };
 
 // STYLE-v2 §4 content card: white, card radius. Name in subtitle, meta in label
-// --muted, price pill top-right in the module colour (numeral at 20px), a 2×2
-// grid of tinted info panels, and a full-width --speak action button.
+// --muted, price pill top-right in the module colour (numeral at 20px), an
+// optional 2×2 grid of tinted info panels. Whole card is tappable when onClick
+// is given (opens the detail sheet).
 export function ContentCard({
   module,
   title,
   meta,
   price,
   info,
-  actionLabel,
-  onAction,
+  onClick,
   children,
 }: {
   module: ModuleKey;
   title: string;
   meta?: string;
+  /** Pass a string when the price carries a suffix, e.g. "₹2,800/mo". */
   price?: string | number;
   info?: InfoItem[];
-  actionLabel?: string;
-  onAction?: () => void;
+  onClick?: () => void;
   children?: ReactNode;
 }) {
   const m = MODULE_BY_KEY[module];
   const priceText = typeof price === "number" ? `₹${price}` : price;
 
-  return (
-    <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+  const inner = (
+    <>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="t-subtitle text-ink">{title}</p>
@@ -56,16 +56,20 @@ export function ContentCard({
       )}
 
       {children}
+    </>
+  );
 
-      {actionLabel && (
-        <button
-          type="button"
-          onClick={onAction}
-          className="t-subtitle mt-4 w-full rounded-full bg-speak py-3 text-white [transition:transform_120ms_ease-out] active:scale-[0.98]"
-        >
-          {actionLabel}
-        </button>
-      )}
-    </div>
+  const cls = "w-full rounded-card border border-line bg-surface p-5 text-left shadow-card";
+
+  return onClick ? (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`${cls} [transition:transform_120ms_ease-out] active:scale-[0.98]`}
+    >
+      {inner}
+    </button>
+  ) : (
+    <div className={cls}>{inner}</div>
   );
 }

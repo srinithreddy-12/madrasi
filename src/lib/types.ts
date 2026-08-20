@@ -24,6 +24,23 @@ export type FoodPlace = {
   blurb: string | null;
 };
 
+export type Laundry = {
+  id: string;
+  name: string;
+  area: string;
+  per_kg: number;
+  iron_per_piece: number;
+  dry_clean_from: number;
+  rating: number;
+  reviews: number;
+  distance_km: number;
+  pickup: boolean;
+  student_discount: string | null;
+  timings: string;
+  student_score: number;
+  phone: string | null;
+};
+
 export type AxisTotal = { axis: Axis; total: number }; // total capped 0..100 by the view
 
 export type Profile = {
