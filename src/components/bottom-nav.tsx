@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home } from "lucide-react";
+import { Home, User } from "lucide-react";
 import { MODULE_BY_KEY } from "@/lib/modules";
 
 // Nav sections, in order — Eat lives inside Services now (its old slot is
@@ -16,6 +16,7 @@ const NAV_MODULE_KEYS = ["speak", "move", "live", "explore"] as const;
 export function BottomNav() {
   const pathname = usePathname();
   const homeActive = pathname === "/";
+  const profileActive = pathname === "/profile" || pathname.startsWith("/profile/");
 
   return (
     <nav
@@ -75,6 +76,28 @@ export function BottomNav() {
             </li>
           );
         })}
+        <li className="flex-1">
+          <Link
+            href="/profile"
+            aria-current={profileActive ? "page" : undefined}
+            className="flex min-h-[60px] flex-col items-center justify-center gap-1 px-1"
+          >
+            <span
+              className={`pressable flex h-9 w-9 items-center justify-center rounded-full ${
+                profileActive ? "bg-ink shadow-card" : ""
+              }`}
+            >
+              <User
+                size={20}
+                strokeWidth={profileActive ? 2.4 : 2}
+                className={profileActive ? "text-white" : "text-muted"}
+              />
+            </span>
+            <span className={`t-micro ${profileActive ? "font-semibold text-ink" : "text-muted"}`}>
+              Profile
+            </span>
+          </Link>
+        </li>
       </ul>
     </nav>
   );
