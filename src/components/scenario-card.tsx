@@ -5,10 +5,14 @@ import { ChevronDown, Lightbulb, Play, Square, Volume2 } from "lucide-react";
 import type { Scenario, ScenarioLine } from "@/lib/types";
 import { speak, speakSequence } from "@/lib/voice";
 
-// Voice casting (VOICE.md): the two speakers must be audibly different — YOU is
-// a higher, younger voice; the other person is lower and slower.
-const lineVoice = (l: ScenarioLine) =>
-  l.who === "you" ? { pitch: 1.1, rate: 0.92 } : { pitch: 0.85, rate: 0.9 };
+// Voice casting (VOICE.md): the two speakers must be audibly different. Sarvam
+// gets a distinct speaker per seeded `voice` role (female/male/elder); the pitch
+// and rate keep the browser fallback cast too — YOU higher/faster, the other
+// person lower/slower.
+const lineVoice = (l: ScenarioLine) => ({
+  voice: l.voice,
+  ...(l.who === "you" ? { pitch: 1.1, rate: 0.92 } : { pitch: 0.85, rate: 0.9 }),
+});
 
 export function ScenarioCard({ scenario }: { scenario: Scenario }) {
   const [open, setOpen] = useState(false);

@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase/client";
 import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
 import type { Lesson, Phrase, Scenario } from "@/lib/types";
 import { MODULE_BY_KEY } from "@/lib/modules";
-import { speakSequence, tamilVoiceAvailable } from "@/lib/voice";
+import { prewarm, speakSequence, tamilVoiceAvailable } from "@/lib/voice";
 import { awardLessonXp, completedLessonIds } from "@/lib/xp";
 import { TranslatePanel } from "@/components/translate-panel";
 import { ScenarioCard } from "@/components/scenario-card";
@@ -46,9 +46,16 @@ export default function SpeakPage() {
       const ph = (pRes.data ?? []) as Phrase[];
       setPhrases(ph);
       setLessons((lRes.data ?? []) as Lesson[]);
-      setScenarios((sRes.data ?? []) as Scenario[]);
+      const sc = (sRes.data ?? []) as Scenario[];
+      setScenarios(sc);
       if (ph.length) setSituation(ph[0].situation);
       setReady(true);
+      // Pre-warm the six scenario openers so the first tap on stage is instant.
+      const openers = sc
+        .map((s) => s.lines?.[0])
+        .filter((l): l is NonNullable<typeof l> => Boolean(l?.ta))
+        .map((l) => ({ text: l.ta, voice: l.voice }));
+      if (openers.length) void prewarm(openers);
     })();
   }, []);
 
