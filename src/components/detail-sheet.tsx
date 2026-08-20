@@ -1,11 +1,12 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { Phone, MapPin, Bookmark } from "lucide-react";
 import type { ModuleDef } from "@/lib/modules";
 
-// Bottom detail sheet shared by /eat and /live (DEMO-SPRINT Block A).
+// Bottom detail sheet shared by /eat, /live and /explore (DEMO-SPRINT Block A).
 // Fixed action row: CALL (tel:), DIRECTIONS (Google Maps dir, new tab), SAVE.
 export function DetailSheet({
   open,
@@ -13,6 +14,7 @@ export function DetailSheet({
   module,
   name,
   area,
+  image,
   phone,
   saved,
   onToggleSave,
@@ -23,6 +25,8 @@ export function DetailSheet({
   module: ModuleDef;
   name: string;
   area: string;
+  /** Optional hero photo shown above the name. */
+  image?: string;
   phone?: string | null;
   saved: boolean;
   onToggleSave: () => void;
@@ -52,6 +56,11 @@ export function DetailSheet({
             className="relative z-10 max-h-[85dvh] w-full max-w-[440px] overflow-y-auto rounded-t-[28px] bg-surface p-5"
           >
             <div aria-hidden="true" className="mx-auto mb-3 h-1 w-10 rounded-full bg-line" />
+            {image && (
+              <div className="relative mb-4 h-44 w-full overflow-hidden rounded-inner">
+                <Image src={image} alt={name} fill sizes="440px" className="object-cover" />
+              </div>
+            )}
             <h2 className="t-title text-ink">{name}</h2>
             <p className="t-label text-muted">{area}</p>
 

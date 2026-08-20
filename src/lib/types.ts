@@ -41,6 +41,26 @@ export type Laundry = {
   phone: string | null;
 };
 
+export type Place = {
+  id: string;
+  name: string;
+  category: string;
+  area: string;
+  rating: number;
+  reviews: number;
+  entry: number;
+  best_time: string | null;
+  duration: string | null;
+  crowd: "Low" | "Medium" | "High";
+  student_score: number; // 0..100
+  budget: number;
+  transport: string | null;
+  nearby_food: string[];
+  emoji: string | null;
+  description: string | null;
+  tags: string[];
+};
+
 export type AxisTotal = { axis: Axis; total: number }; // total capped 0..100 by the view
 
 export type Profile = {
