@@ -3,6 +3,7 @@ import { Gabarito, Space_Grotesk, Anek_Tamil } from "next/font/google";
 import "./globals.css";
 import { SupabaseAuthProvider } from "@/lib/supabase/auth-provider";
 import { BottomNav } from "@/components/bottom-nav";
+import { Assistant } from "@/components/assistant";
 
 // STYLE-v2 type families: Gabarito for display/headings/buttons, Space Grotesk
 // for body + every numeral, Anek Tamil for SPEAK's Tamil script.
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <main className="flex-1 pb-24">{children}</main>
             <BottomNav />
           </div>
+          <Assistant />
         </SupabaseAuthProvider>
       </body>
     </html>
