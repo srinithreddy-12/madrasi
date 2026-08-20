@@ -1,26 +1,125 @@
 @import "tailwindcss";
 
+/*
+  MADRASI design tokens — v1.1 "Crank It" (STYLE-v1.1.md).
+  Palette values unchanged except --faded. Metaphor unchanged. What changed is
+  intensity: bigger type, full-bleed bands, unrationed amber-on-ink.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #16130e; /* near-black, warm — primary text + ink bands */
+  --manila: #efe4ce; /* ticket paper — light-band background */
+  --paper: #f7f0e2; /* raised card surface on manila */
+  --mtc: #0f4d3a; /* MTC bottle green — buttons, nav, route badges */
+  --amber: #ffa51f; /* LED / progression — unrationed on ink */
+  --stamp: #c4342a; /* rubber-stamp red — punch marks / verified / destructive */
+  --faded: #6b6050; /* secondary text — WCAG AA on both manila and paper */
+
+  color-scheme: light; /* Night Bus dark mode deferred */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Palette → Tailwind color utilities. --mtc stays a runtime var for v2 rebind. */
+  --color-ink: var(--ink);
+  --color-manila: var(--manila);
+  --color-paper: var(--paper);
+  --color-mtc: var(--mtc);
+  --color-amber: var(--amber);
+  --color-stamp: var(--stamp);
+  --color-faded: var(--faded);
+  --color-background: var(--manila);
+  --color-foreground: var(--ink);
+
+  /* Typography — Anek superfamily + DM Mono, loaded via next/font in layout.tsx */
+  --font-sans: var(--font-anek-latin), ui-sans-serif, system-ui, sans-serif;
+  --font-tamil: var(--font-anek-tamil), var(--font-anek-latin), ui-sans-serif,
+    sans-serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  /*
+    v1.1 scale — nothing sits at the same size as its neighbour.
+      hero 64 / display 40 / title 24 / fare 32 / body 16 / label·13 / micro·11
+    (legacy `heading`/`meta` kept so the Phase-3 screens still build; they get
+    re-typed when those screens are patched.)
+  */
+  --text-hero: 4rem;
+  --text-hero--line-height: 0.88;
+  --text-display: 2.5rem;
+  --text-display--line-height: 0.92;
+  --text-title: 1.5rem;
+  --text-title--line-height: 1.05;
+  --text-fare: 2rem;
+  --text-fare--line-height: 1;
+  --text-heading: 1.1875rem;
+  --text-heading--line-height: 1.25;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5;
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.2;
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.4;
+  --text-micro: 0.6875rem;
+  --text-micro--line-height: 1.2;
+
+  --tracking-signage: -0.01em;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Backdrop behind the phone column — a darker warm tone so the column reads as
+   an object, not a floating card. */
+body {
+  background: color-mix(in oklab, var(--manila) 78%, var(--ink) 22%);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@layer components {
+  /* Title voice: condensed uppercase, tight. wdth 75 is Anek Latin's floor —
+     the spec asked 62.5 but the variable axis does not go below 75. */
+  .signage {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-variation-settings: "wght" 700, "wdth" 75;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-signage);
+  }
+
+  /* Hero/display voice: heavier, maximally condensed, tighter tracking. */
+  .signage-xl {
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-variation-settings: "wght" 800, "wdth" 75;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    line-height: 0.9;
+  }
+
+  /* Mono label voice — status strip, section bars, meta. */
+  .label {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* Every number — tabular mono, uppercase. Fares render large in this. */
+  .tabular {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    text-transform: uppercase;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Motion guardrail: honour prefers-reduced-motion everywhere (BRIEF.md). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
