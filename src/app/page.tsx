@@ -68,7 +68,7 @@ export default function HomePage() {
   const level = levelFromXp(progress?.totalXp ?? 0);
 
   return (
-    <div className="flex flex-col gap-3 px-4 py-4">
+    <div className="screen gap-2">
       <GreetingRow
         name={name}
         right={
@@ -88,7 +88,7 @@ export default function HomePage() {
 
       {/* Today's quiz shortcut (if unplayed) */}
       {!quizDone && (
-        <Link href="/speak" className="pressable block rounded-block bg-live p-5 text-white">
+        <Link href="/speak" className="pressable block rounded-block bg-live p-card text-white">
           <p className="t-micro opacity-70">Today&apos;s quiz</p>
           <p className="t-title mt-1">3 quick questions · +30 XP</p>
           <p className="t-label mt-2 opacity-90">Tap to play →</p>
@@ -110,7 +110,7 @@ export default function HomePage() {
             See all
           </Link>
         </div>
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+        <div className="-mx-3.5 flex gap-2 overflow-x-auto px-3.5 pb-1">
           {cheap.map((f) => (
             <Link
               key={f.id}
@@ -119,7 +119,7 @@ export default function HomePage() {
             >
               <p className="t-subtitle truncate text-ink">{f.name}</p>
               <p className="t-label text-muted">{f.area}</p>
-              <span className="t-stat self-start rounded-full bg-eat px-3 py-1 text-ink" style={{ fontSize: "18px" }}>
+              <span className="t-stat self-start rounded-full bg-eat px-3 py-1 text-ink" style={{ fontSize: "16px" }}>
                 {inr(f.avg_price)}
               </span>
             </Link>
@@ -136,7 +136,7 @@ export default function HomePage() {
               See all
             </Link>
           </div>
-          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+          <div className="-mx-3.5 flex gap-2 overflow-x-auto px-3.5 pb-1">
             {bundles.map((b) => (
               <Link
                 key={b.id}
@@ -151,7 +151,7 @@ export default function HomePage() {
                 <p className="t-subtitle truncate pr-12 text-ink">{b.name}</p>
                 <p className="t-label truncate text-muted">{b.tagline}</p>
                 <div className="flex items-end gap-2">
-                  <span className="t-stat self-start rounded-full bg-live px-3 py-1 text-white" style={{ fontSize: "18px" }}>
+                  <span className="t-stat self-start rounded-full bg-live px-3 py-1 text-white" style={{ fontSize: "16px" }}>
                     {inr(b.price)}
                   </span>
                   <span className="t-micro text-muted line-through">{inr(b.mrp)}</span>
@@ -166,7 +166,7 @@ export default function HomePage() {
       {pick && (
         <section className="flex flex-col gap-2">
           <h2 className="t-title text-ink">Tonight&apos;s pick</h2>
-          <div className="flex flex-col gap-3 rounded-block bg-explore-tint p-5">
+          <div className="flex flex-col gap-2 rounded-block bg-explore-tint p-card">
             <div>
               <p className="t-subtitle text-ink">{pick.name}</p>
               <p className="t-label text-muted">

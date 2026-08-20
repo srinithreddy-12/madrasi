@@ -21,7 +21,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Sections"
-      className="material-bar sticky bottom-0 z-30 rounded-t-[28px] pb-[env(safe-area-inset-bottom)]"
+      className="material-bar sticky bottom-0 z-30 rounded-t-block pb-[env(safe-area-inset-bottom)]"
       style={{ borderTop: "1px solid var(--material-hairline)" }}
     >
       <ul className="mx-auto flex max-w-[440px] items-stretch px-1 pt-1.5">
@@ -29,7 +29,7 @@ export function BottomNav() {
           <Link
             href="/"
             aria-current={homeActive ? "page" : undefined}
-            className="flex min-h-[60px] flex-col items-center justify-center gap-1 px-1"
+            className="flex min-h-[52px] flex-col items-center justify-center gap-1 px-1"
           >
             <span
               className={`pressable flex h-9 w-9 items-center justify-center rounded-full ${
@@ -37,7 +37,7 @@ export function BottomNav() {
               }`}
             >
               <Home
-                size={20}
+                size={18}
                 strokeWidth={homeActive ? 2.4 : 2}
                 className={homeActive ? "text-white" : "text-muted"}
               />
@@ -56,7 +56,7 @@ export function BottomNav() {
               <Link
                 href={m.path}
                 aria-current={active ? "page" : undefined}
-                className="flex min-h-[60px] flex-col items-center justify-center gap-1 px-1"
+                className="flex min-h-[52px] flex-col items-center justify-center gap-1 px-1"
               >
                 <span
                   className={`pressable flex h-9 w-9 items-center justify-center rounded-full ${
@@ -64,7 +64,7 @@ export function BottomNav() {
                   }`}
                 >
                   <Icon
-                    size={20}
+                    size={18}
                     strokeWidth={active ? 2.4 : 2}
                     className={active ? m.onColorClass : "text-muted"}
                   />
@@ -80,7 +80,7 @@ export function BottomNav() {
           <Link
             href="/profile"
             aria-current={profileActive ? "page" : undefined}
-            className="flex min-h-[60px] flex-col items-center justify-center gap-1 px-1"
+            className="flex min-h-[52px] flex-col items-center justify-center gap-1 px-1"
           >
             <span
               className={`pressable flex h-9 w-9 items-center justify-center rounded-full ${
@@ -88,7 +88,7 @@ export function BottomNav() {
               }`}
             >
               <User
-                size={20}
+                size={18}
                 strokeWidth={profileActive ? 2.4 : 2}
                 className={profileActive ? "text-white" : "text-muted"}
               />

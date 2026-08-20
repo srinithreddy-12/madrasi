@@ -17,7 +17,7 @@ export function StatTrio({ items }: { items: StatItem[] }) {
       {items.map((it, i) => (
         <div
           key={it.label}
-          className={`flex-1 px-3 py-6 text-center ${
+          className={`flex-1 px-3 py-5 text-center ${
             i > 0 ? "border-l border-line-strong" : ""
           }`}
         >

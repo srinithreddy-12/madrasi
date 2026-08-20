@@ -88,7 +88,7 @@ export function TranslatePanel() {
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-card bg-speak-tint p-5">
+    <div className="flex flex-col gap-3 rounded-card bg-speak-tint p-card">
       <form
         onSubmit={(e) => {
           e.preventDefault();

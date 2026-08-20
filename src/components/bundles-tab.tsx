@@ -46,7 +46,7 @@ export function BundlesTab() {
         <p className="t-body text-muted">No bundles yet.</p>
       ) : (
         bundles.map((b) => (
-          <div key={b.id} className="relative flex flex-col gap-3 rounded-block bg-live-tint p-5">
+          <div key={b.id} className="relative flex flex-col gap-3 rounded-block bg-live-tint p-card">
             {b.popular && (
               <span className="t-chip absolute right-4 top-4 rounded-full bg-live px-3 py-1 text-white">
                 POPULAR
@@ -112,7 +112,7 @@ export function BundlesTab() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "tween", duration: 0.28, ease: "easeOut" }}
-              className="relative z-10 w-full max-w-[440px] rounded-t-[28px] bg-surface p-5"
+              className="relative z-10 w-full max-w-[440px] rounded-t-block bg-surface p-card"
             >
               <div aria-hidden="true" className="mx-auto mb-3 h-1 w-10 rounded-full bg-line" />
               <p className="t-title text-ink">{reserve.name}</p>

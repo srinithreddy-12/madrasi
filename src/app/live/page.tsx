@@ -34,7 +34,7 @@ function ServicesHub() {
   const [tab, setTab] = useState(params.get("tab") ?? "eat");
 
   return (
-    <div className="flex flex-col gap-3 px-4 py-4">
+    <div className="screen gap-2">
       <NavHeader
         title="Services"
         routeCode="29C"

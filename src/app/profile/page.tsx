@@ -129,11 +129,11 @@ export default function ProfilePage() {
   const savedCount = savedRows.food.length + savedRows.place.length + savedRows.phrase.length;
 
   return (
-    <div className="flex flex-col gap-4 px-4 py-4">
+    <div className="screen gap-4">
       <NavHeader title="Profile" back={{ href: "/", label: "Home" }} />
 
       {/* Editable identity */}
-      <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5 shadow-card">
+      <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-card shadow-card">
         <label className="flex flex-col gap-1">
           <span className="t-micro text-muted">Name</span>
           <input
@@ -175,7 +175,7 @@ export default function ProfilePage() {
                 key={a}
                 onClick={() => updateProfile({ area: a })}
                 aria-pressed={profile?.area === a}
-                className={`t-chip h-[34px] rounded-full border px-3.5 ${
+                className={`t-chip h-[30px] rounded-full border px-3.5 ${
                   profile?.area === a ? "border-transparent bg-speak text-white" : "border-line text-ink"
                 }`}
               >
@@ -192,7 +192,7 @@ export default function ProfilePage() {
                 key={v.key}
                 onClick={() => updateProfile({ veg_pref: v.key })}
                 aria-pressed={profile?.veg_pref === v.key}
-                className={`t-chip h-[34px] rounded-full border px-3.5 ${
+                className={`t-chip h-[30px] rounded-full border px-3.5 ${
                   profile?.veg_pref === v.key ? "border-transparent bg-eat text-ink" : "border-line text-ink"
                 }`}
               >
@@ -212,7 +212,7 @@ export default function ProfilePage() {
           { value: profile?.freezes_available ?? 0, label: "Streak freezes" },
         ]}
       />
-      <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+      <div className="rounded-card border border-line bg-surface p-card shadow-card">
         <p className="t-micro text-muted">Your five routes</p>
         <div className="mt-4 flex justify-between">
           {MODULES.map((m, i) => (
@@ -222,7 +222,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Savings */}
-      <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+      <div className="rounded-card border border-line bg-surface p-card shadow-card">
         <p className="t-micro text-muted">Saved so far</p>
         <p className="t-stat text-live">{inr(savingsTotal)}</p>
       </div>
@@ -239,7 +239,7 @@ export default function ProfilePage() {
               key={t.key}
               onClick={() => setTab(t.key)}
               aria-pressed={tab === t.key}
-              className={`t-chip h-[34px] rounded-full border px-3.5 ${
+              className={`t-chip h-[30px] rounded-full border px-3.5 ${
                 tab === t.key ? "border-transparent bg-speak text-white" : "border-line text-ink"
               }`}
             >

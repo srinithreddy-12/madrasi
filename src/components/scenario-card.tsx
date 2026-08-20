@@ -49,7 +49,7 @@ export function ScenarioCard({ scenario }: { scenario: Scenario }) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-3 p-5 text-left"
+        className="flex w-full items-center justify-between gap-3 p-card text-left"
       >
         <div>
           <p className="t-subtitle text-ink">{scenario.title}</p>

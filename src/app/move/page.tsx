@@ -179,7 +179,7 @@ function MovePlanner() {
   const cheapestPaidKey = rows.find((r) => r.cost > 0)?.key;
 
   return (
-    <div className="flex flex-col gap-4 px-4 py-4">
+    <div className="screen gap-4">
       <NavHeader
         title="Move"
         routeCode="23C"
@@ -189,7 +189,7 @@ function MovePlanner() {
       />
 
       {/* Route planner */}
-      <div className="flex flex-col gap-2 rounded-card border border-line bg-surface p-5 shadow-card">
+      <div className="flex flex-col gap-2 rounded-card border border-line bg-surface p-card shadow-card">
         <select
           value={from}
           onChange={(e) => setFrom(e.target.value)}
@@ -270,10 +270,10 @@ function MovePlanner() {
         <p className="t-label mb-2 flex items-center gap-1.5 text-muted">
           <Calculator size={15} strokeWidth={2} /> Cost calculator
         </p>
-        <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+        <div className="rounded-card border border-line bg-surface p-card shadow-card">
           <div className="flex items-baseline justify-between">
             <span className="t-micro text-muted">Distance</span>
-            <span className="t-stat text-move" style={{ fontSize: "32px" }}>{km} km</span>
+            <span className="t-stat text-move" style={{ fontSize: "20px" }}>{km} km</span>
           </div>
           <input
             type="range"

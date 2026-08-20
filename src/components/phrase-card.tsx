@@ -14,7 +14,7 @@ export function PhraseCard({
   onToggleSave: () => void;
 }) {
   return (
-    <div className="flex items-start justify-between gap-3 rounded-card border border-line bg-surface p-5 shadow-card">
+    <div className="flex items-start justify-between gap-3 rounded-card border border-line bg-surface p-card shadow-card">
       <div className="min-w-0">
         <p className="t-label text-muted">{phrase.en}</p>
         <p lang="ta" className="t-title mt-1 text-ink" style={{ fontFamily: "var(--font-tamil)" }}>

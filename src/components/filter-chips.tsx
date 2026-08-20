@@ -19,7 +19,7 @@ export function FilterChips({
   module: ModuleDef;
 }) {
   return (
-    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="-mx-3.5 flex gap-2 overflow-x-auto px-3.5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {chips.map((c) => {
         const active = c.key === value;
         return (
@@ -28,7 +28,7 @@ export function FilterChips({
             type="button"
             onClick={() => onChange(c.key)}
             aria-pressed={active}
-            className={`t-chip pressable h-9 shrink-0 whitespace-nowrap rounded-full border px-4 ${
+            className={`t-chip pressable h-[30px] shrink-0 whitespace-nowrap rounded-full border px-3.5 ${
               active
                 ? `${module.bgClass} ${module.onColorClass} border-transparent font-semibold shadow-card`
                 : "border-line bg-surface text-ink"

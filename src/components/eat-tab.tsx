@@ -94,10 +94,10 @@ export function EatTab() {
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <FilterChips chips={TABS} value={tab} onChange={setTab} module={EAT} />
       {cap != null && (
-        <button onClick={() => setCap(null)} className="t-chip h-[34px] self-start rounded-full bg-eat px-3.5 text-ink">
+        <button onClick={() => setCap(null)} className="t-chip h-[30px] self-start rounded-full bg-eat px-3.5 text-ink">
           ≤ {inr(cap)} ✕
         </button>
       )}

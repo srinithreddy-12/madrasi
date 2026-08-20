@@ -5,7 +5,7 @@ import { BundlesTab } from "@/components/bundles-tab";
 // Bundles isn't one of the 5 nav modules — reached from Home's preview row.
 export default function BundlesPage() {
   return (
-    <div className="flex flex-col gap-4 px-4 py-4">
+    <div className="screen gap-4">
       <Link href="/" className="t-label flex items-center gap-1 text-muted">
         <ArrowLeft size={16} /> Home
       </Link>

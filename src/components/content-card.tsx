@@ -43,11 +43,11 @@ export function ContentCard({
       <p className="t-subtitle truncate text-ink">{title}</p>
       {priceText != null && (
         <span
-          className={`shrink-0 rounded-full ${m.bgClass} ${m.onColorClass} ${
-            image ? "px-2.5 py-1 text-[13px] font-semibold" : "px-3 py-1.5"
+          className={`inline-flex shrink-0 items-center rounded-full ${m.bgClass} ${m.onColorClass} ${
+            image ? "px-2.5 py-1 text-[12px] font-semibold" : "h-[26px] px-2.5"
           }`}
         >
-          {image ? priceText : <span className="t-stat" style={{ fontSize: "20px" }}>{priceText}</span>}
+          {image ? priceText : <span className="t-stat" style={{ fontSize: "16px" }}>{priceText}</span>}
         </span>
       )}
     </div>
@@ -56,8 +56,8 @@ export function ContentCard({
   const inner = image ? (
     <>
       <div className="flex items-center gap-3">
-        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl">
-          <Image src={image} alt={title} fill sizes="80px" className="object-cover" />
+        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-inner">
+          <Image src={image} alt={title} fill sizes="64px" className="object-cover" />
         </div>
         <div className="min-w-0 flex-1">
           {titleBlock}
@@ -77,12 +77,14 @@ export function ContentCard({
       {meta && <p className="t-label mt-0.5 text-muted">{meta}</p>}
 
       {info && info.length > 0 && (
-        <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="mt-3 flex flex-wrap gap-1.5">
           {info.map((it) => (
-            <div key={it.label} className={`rounded-inner px-3 py-2 ${m.tintClass}`}>
-              <p className="t-micro text-muted">{it.label}</p>
-              <p className="t-label text-ink">{it.value}</p>
-            </div>
+            <span
+              key={it.label}
+              className={`t-micro inline-flex items-center gap-1 rounded-full px-2 py-1 ${m.tintClass} text-ink`}
+            >
+              <span className="text-muted">{it.label}</span> {it.value}
+            </span>
           ))}
         </div>
       )}
@@ -92,7 +94,7 @@ export function ContentCard({
   );
 
   const cls = `w-full overflow-hidden rounded-card border border-line bg-surface text-left shadow-card ${
-    image ? "p-3" : "p-5"
+    image ? "p-2.5" : "p-card"
   }`;
 
   return onClick ? (

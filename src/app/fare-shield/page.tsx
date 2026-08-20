@@ -57,7 +57,7 @@ export default function FareShieldPage() {
   }
 
   return (
-    <div className="flex flex-col gap-3 px-4 py-4">
+    <div className="screen gap-2">
       <NavHeader
         title="Fare Shield"
         routeCode="23C"
@@ -68,7 +68,7 @@ export default function FareShieldPage() {
       />
 
       {/* Inputs */}
-      <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5 shadow-card">
+      <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-card shadow-card">
         <label className="flex flex-col gap-1">
           <span className="t-micro text-muted">Pickup</span>
           <input
@@ -98,7 +98,7 @@ export default function FareShieldPage() {
       </div>
 
       {/* The verdict — the number is the hero */}
-      <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+      <div className="rounded-card border border-line bg-surface p-card shadow-card">
         <p className="t-micro text-muted">Fair fare</p>
         <CountUp value={fair} format={(n) => inr(n)} className="t-stat block text-move" />
         <p className="t-label mt-2 text-muted line-through">they&apos;ll quote {inr(tourist)}</p>
@@ -106,7 +106,7 @@ export default function FareShieldPage() {
       </div>
 
       {/* Say it in Tamil */}
-      <div className="rounded-card bg-speak-tint p-5">
+      <div className="rounded-card bg-speak-tint p-card">
         <p className="t-micro text-muted">Say this to the driver</p>
         <p lang="ta" className="t-title mt-1 text-ink" style={{ fontFamily: "var(--font-tamil)" }}>
           {CHENNAI_NEGOTIATION.ta}
@@ -123,14 +123,14 @@ export default function FareShieldPage() {
 
       {/* After the ride */}
       {outcome === "win" ? (
-        <div className="rounded-card bg-move-tint p-5">
+        <div className="rounded-card bg-move-tint p-card">
           <p className="t-body text-ink">
             Nice — <span className="text-live">{inr(saved)}</span> logged and{" "}
             <span className="text-move">+{MOVE_XP} XP</span> on Move.
           </p>
         </div>
       ) : outcome === "nowin" ? (
-        <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+        <div className="rounded-card border border-line bg-surface p-card shadow-card">
           <p className="t-body text-ink">No worries — next auto. Nothing logged.</p>
         </div>
       ) : (

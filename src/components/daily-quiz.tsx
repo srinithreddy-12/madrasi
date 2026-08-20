@@ -75,7 +75,7 @@ export function DailyQuiz({ phrases }: { phrases: Phrase[] }) {
 
   if (played && !done) {
     return (
-      <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+      <div className="rounded-card border border-line bg-surface p-card shadow-card">
         <p className="t-micro text-muted">Today&apos;s quiz</p>
         <p className="t-subtitle mt-1 text-ink">Done for today — come back tomorrow.</p>
       </div>
@@ -84,7 +84,7 @@ export function DailyQuiz({ phrases }: { phrases: Phrase[] }) {
 
   if (done) {
     return (
-      <div className="rounded-card bg-speak-tint p-5">
+      <div className="rounded-card bg-speak-tint p-card">
         <p className="t-micro text-muted">Today&apos;s quiz</p>
         <p className="t-stat mt-1 text-speak">{correct}/{quiz.length}</p>
         <p className="t-label text-ink">+{correct * 10} XP on Speak</p>
@@ -94,7 +94,7 @@ export function DailyQuiz({ phrases }: { phrases: Phrase[] }) {
 
   const q = quiz[idx];
   return (
-    <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+    <div className="rounded-card border border-line bg-surface p-card shadow-card">
       <p className="t-micro text-muted">Today&apos;s quiz · {idx + 1}/{quiz.length}</p>
       <p className="t-subtitle mt-1 text-ink">How do you say “{q.en}”?</p>
 

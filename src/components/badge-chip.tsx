@@ -17,7 +17,7 @@ export function BadgeChip({
 }) {
   return (
     <span
-      className={`t-chip inline-flex h-8 items-center gap-1.5 rounded-full px-3 ${
+      className={`t-chip inline-flex h-[26px] items-center gap-1.5 rounded-full px-2.5 ${
         unlocked ? `${fillClass} ${onColorClass}` : "bg-line text-muted"
       }`}
     >

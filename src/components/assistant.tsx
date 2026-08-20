@@ -85,14 +85,14 @@ export function Assistant() {
 
   return (
     <>
-      {/* Floating button — 56px, forest, 72px above the bottom nav */}
+      {/* Floating button — 48px, forest, 64px above the bottom nav */}
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Ask Circle"
-        className="pressable shadow-pop fixed bottom-[calc(76px+env(safe-area-inset-bottom))] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-speak text-white"
+        className="pressable shadow-pop fixed bottom-[calc(64px+env(safe-area-inset-bottom))] right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-speak text-white"
       >
-        <MessageCircle size={24} />
+        <MessageCircle size={22} />
       </button>
 
       <AnimatePresence>
@@ -111,7 +111,7 @@ export function Assistant() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 380, damping: 36 }}
-              className="shadow-raised relative z-10 flex h-[78dvh] w-full max-w-[440px] flex-col rounded-t-[28px] bg-bg"
+              className="shadow-raised relative z-10 flex h-[78dvh] w-full max-w-[440px] flex-col rounded-t-block bg-bg"
             >
               <div aria-hidden="true" className="mx-auto mt-2 h-1.5 w-11 rounded-full bg-line-strong" />
               <div className="flex items-center justify-between px-5 pb-2 pt-3">

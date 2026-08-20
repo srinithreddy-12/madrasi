@@ -36,9 +36,15 @@
 
   /* Layered elevation. Cards rest close to the page; sheets and the FAB
      lift further. Warm-tinted shadow, never a hard grey. */
-  --shadow-card: 0 1px 2px rgba(41, 37, 30, 0.04), 0 4px 12px rgba(41, 37, 30, 0.05);
-  --shadow-raised: 0 2px 6px rgba(41, 37, 30, 0.08), 0 12px 28px rgba(41, 37, 30, 0.1);
-  --shadow-pop: 0 8px 24px -6px rgba(41, 37, 30, 0.28);
+  --shadow-card: 0 1px 4px rgba(41, 37, 30, 0.05);
+  --shadow-raised: 0 1px 4px rgba(41, 37, 30, 0.06), 0 8px 20px rgba(41, 37, 30, 0.08);
+  --shadow-pop: 0 6px 18px -6px rgba(41, 37, 30, 0.24);
+
+  /* COMPACT.md spacing scale — the single source of truth for page and card
+     padding. Card/section gaps stay as utilities so section rhythm can differ
+     from card rhythm on the same screen. */
+  --pad-page: 14px; /* screen l/r/t padding (was 16) */
+  --pad-card: 14px; /* padding inside a card / block (was 20) */
 
   color-scheme: light;
 }
@@ -70,9 +76,10 @@
   --font-grotesk: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-tamil: var(--font-anek-tamil), var(--font-space-grotesk), sans-serif;
 
-  --radius-block: 28px;
-  --radius-card: 20px;
-  --radius-inner: 14px;
+  /* COMPACT.md density patch: radii scaled down (28/20/14 -> 18/14/10). */
+  --radius-block: 18px;
+  --radius-card: 14px;
+  --radius-inner: 10px;
 }
 
 body {
@@ -87,10 +94,12 @@ body {
 
 @layer components {
   /* Type scale. stat = Space Grotesk 700, the loudest thing on screen. */
+  /* COMPACT.md density patch: type scale compressed one level (line heights
+     and weights unchanged, so the hierarchy is preserved, just quieter). */
   .t-stat {
     font-family: var(--font-grotesk);
     font-weight: 700;
-    font-size: 3rem; /* 48 */
+    font-size: 1.875rem; /* 30 (was 48) */
     line-height: 1;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
@@ -99,52 +108,52 @@ body {
   .t-largetitle {
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: 2.125rem; /* 34 */
+    font-size: 1.5rem; /* 24 (was 34) */
     line-height: 1.05;
     letter-spacing: -0.02em;
   }
   .t-hero {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 2rem; /* 32 */
+    font-size: 1.4375rem; /* 23 (was 32) */
     line-height: 1.1;
     letter-spacing: -0.01em;
   }
   .t-title {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 1.375rem; /* 22 */
+    font-size: 1.0625rem; /* 17 (was 22) */
     line-height: 1.25;
     letter-spacing: -0.01em;
   }
   .t-subtitle {
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 1.0625rem; /* 17 */
+    font-size: 0.9375rem; /* 15 (was 17) */
     line-height: 1.35;
   }
   .t-body {
     font-family: var(--font-grotesk);
     font-weight: 400;
-    font-size: 0.9375rem; /* 15 */
+    font-size: 0.875rem; /* 14 (was 15) */
     line-height: 1.55;
   }
   .t-label {
     font-family: var(--font-grotesk);
     font-weight: 500;
-    font-size: 0.8125rem; /* 13 */
+    font-size: 0.75rem; /* 12 (was 13) */
     line-height: 1.3;
   }
   .t-chip {
     font-family: var(--font-grotesk);
     font-weight: 500;
-    font-size: 0.8125rem; /* 13 */
+    font-size: 0.75rem; /* 12 (was 13) */
     line-height: 1;
   }
   .t-micro {
     font-family: var(--font-grotesk);
     font-weight: 500;
-    font-size: 0.6875rem; /* 11 */
+    font-size: 0.625rem; /* 10 (was 11) */
     line-height: 1.2;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -182,6 +191,20 @@ body {
   }
   .pressable:active {
     transform: scale(0.97);
+  }
+
+  /* Standard screen shell — centralises page padding to --pad-page so the
+     COMPACT density patch lives in one token. Pages add their own gap utility
+     (gap-2 for card lists, gap-4 for section-heavy screens). */
+  .screen {
+    display: flex;
+    flex-direction: column;
+    padding: var(--pad-page);
+  }
+
+  /* Card / block interior padding, driven by --pad-card. */
+  .p-card {
+    padding: var(--pad-card);
   }
 }
 

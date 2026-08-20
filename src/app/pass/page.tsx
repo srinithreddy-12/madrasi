@@ -71,7 +71,7 @@ export default function PassPage() {
   const earned = badges.filter((b) => b.isEarned).length;
 
   return (
-    <div className="flex flex-col gap-3 px-4 py-4">
+    <div className="screen gap-2">
       <NavHeader
         title={`${profile?.display_name ?? "Your"} pass`}
         subtitle={`${(college ?? "No college").toString()} · ${profile?.area ?? "—"}`}
@@ -86,7 +86,7 @@ export default function PassPage() {
       />
 
       {/* Five progress rings — the five-axis system */}
-      <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+      <div className="rounded-card border border-line bg-surface p-card shadow-card">
         <p className="t-micro text-muted">Your five routes</p>
         <div className="mt-4 flex justify-between">
           {MODULES.map((m, i) => (
@@ -96,7 +96,7 @@ export default function PassPage() {
       </div>
 
       {/* Savings wallet */}
-      <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+      <div className="rounded-card border border-line bg-surface p-card shadow-card">
         <p className="t-micro text-muted">Savings wallet</p>
         <CountUp value={savingsTotal} format={(n) => inr(n)} className="t-stat block text-live" />
         <ul className="mt-4 flex flex-col gap-2">
@@ -117,7 +117,7 @@ export default function PassPage() {
       </div>
 
       {/* Badges */}
-      <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+      <div className="rounded-card border border-line bg-surface p-card shadow-card">
         <p className="t-subtitle text-ink">
           Badges <span className="text-muted">{earned}/{badges.length}</span>
         </p>

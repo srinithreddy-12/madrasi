@@ -11,7 +11,7 @@ export function ModuleTile({ module, progress }: { module: ModuleDef; progress?:
   return (
     <Link
       href={module.path}
-      className={`pressable flex flex-col gap-3 rounded-card p-4 ${module.bgClass} ${module.onColorClass}`}
+      className={`pressable p-card flex flex-col gap-2 rounded-card ${module.bgClass} ${module.onColorClass}`}
     >
       <div className="flex items-center justify-between">
         <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${onInk ? "bg-ink/15" : "bg-white/20"}`}>

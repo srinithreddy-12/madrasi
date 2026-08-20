@@ -54,7 +54,7 @@ export function DetailSheet({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 380, damping: 36 }}
-            className="shadow-raised relative z-10 max-h-[88dvh] w-full max-w-[440px] overflow-y-auto rounded-t-[28px] bg-surface p-5 pb-[calc(env(safe-area-inset-bottom)+20px)]"
+            className="shadow-raised p-card relative z-10 max-h-[88dvh] w-full max-w-[440px] overflow-y-auto rounded-t-block bg-surface pb-[calc(env(safe-area-inset-bottom)+16px)]"
           >
             <div aria-hidden="true" className="mx-auto mb-4 h-1.5 w-11 rounded-full bg-line-strong" />
             {image && (

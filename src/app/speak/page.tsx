@@ -100,7 +100,7 @@ export default function SpeakPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4 px-4 py-4">
+    <div className="screen gap-4">
       <NavHeader
         title="Speak"
         routeCode="5C"

@@ -21,8 +21,8 @@ type ProgressRingProps = {
 export function ProgressRing({
   value,
   color,
-  size = 64,
-  stroke = 6,
+  size = 44,
+  stroke = 4,
   delayMs = 0,
   caption,
 }: ProgressRingProps) {
