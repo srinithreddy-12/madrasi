@@ -71,7 +71,7 @@ export const MODULES: ModuleDef[] = [
   },
   {
     key: "live",
-    label: "Live",
+    label: "Services",
     routeCode: "29C",
     path: "/live",
     icon: WashingMachine,

@@ -21,7 +21,7 @@ export default function LivePage() {
   return (
     <div className="flex flex-col gap-3 px-4 py-4">
       <div>
-        <h1 className="t-hero text-ink">Live</h1>
+        <h1 className="t-hero text-ink">Services</h1>
         <p className="t-label text-muted">29C · Laundry, housing &amp; bundles</p>
       </div>
 
