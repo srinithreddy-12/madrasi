@@ -6,7 +6,6 @@ import { MODULE_BY_KEY } from "@/lib/modules";
 import { FilterChips, type Chip } from "@/components/filter-chips";
 import { EatTab } from "@/components/eat-tab";
 import { LaundryTab } from "@/components/laundry-tab";
-import { BundlesTab } from "@/components/bundles-tab";
 import { HousingTab } from "@/components/housing-tab";
 import { MedicalTab } from "@/components/medical-tab";
 
@@ -16,11 +15,11 @@ const TABS: Chip[] = [
   { key: "laundry", label: "Laundry" },
   { key: "housing", label: "PG & Hostels" },
   { key: "medical", label: "Medical" },
-  { key: "bundles", label: "Bundles" },
 ];
 
 // /live (29C, clay) is the combined hub — reference-app parity: Eat + Laundry
-// share one screen there too. Housing, Medical + Bundles are our own additions.
+// share one screen there too. Housing + Medical are our own additions.
+// Bundles moved to Home (its own /bundles page) to keep this screen focused.
 export default function LivePage() {
   return (
     <Suspense fallback={<div className="px-4 py-6 t-body text-muted">Loading…</div>}>
@@ -37,7 +36,7 @@ function ServicesHub() {
     <div className="flex flex-col gap-3 px-4 py-4">
       <div>
         <h1 className="t-hero text-ink">Services</h1>
-        <p className="t-label text-muted">29C · Food, laundry, housing &amp; bundles</p>
+        <p className="t-label text-muted">29C · Food, laundry, housing &amp; medical</p>
       </div>
 
       <FilterChips chips={TABS} value={tab} onChange={setTab} module={LIVE} />
@@ -48,10 +47,8 @@ function ServicesHub() {
         <LaundryTab />
       ) : tab === "housing" ? (
         <HousingTab />
-      ) : tab === "medical" ? (
-        <MedicalTab />
       ) : (
-        <BundlesTab />
+        <MedicalTab />
       )}
     </div>
   );

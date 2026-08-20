@@ -8,7 +8,7 @@ import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
 import { loadProgress, type Progress } from "@/lib/progress";
 import { MODULES } from "@/lib/modules";
 import { inr, levelFromXp } from "@/lib/format";
-import type { FoodPlace } from "@/lib/types";
+import type { Bundle, FoodPlace } from "@/lib/types";
 import { GreetingRow } from "@/components/greeting-row";
 import { StatTrio } from "@/components/stat-trio";
 import { ModuleBlock } from "@/components/module-block";
@@ -25,7 +25,7 @@ type Place = {
 const BLURBS: Record<string, string> = {
   speak: "Survive Chennai in Tamil",
   move: "Autos, buses & metro — fair fares",
-  live: "Food, laundry, housing & bundles",
+  live: "Food, laundry, housing & medical",
   explore: "Places, plans & weekend trips",
 };
 
@@ -44,17 +44,20 @@ export default function HomePage() {
 
   const [progress, setProgress] = useState<Progress | null>(null);
   const [cheap, setCheap] = useState<FoodPlace[]>([]);
+  const [bundles, setBundles] = useState<Bundle[]>([]);
   const [pick, setPick] = useState<Place | null>(null);
   const [quizDone, setQuizDone] = useState(true);
 
   useEffect(() => {
     setQuizDone(quizPlayedToday());
     (async () => {
-      const [food, places] = await Promise.all([
+      const [food, places, bundlesRes] = await Promise.all([
         supabase.from("food_places").select("*").order("avg_price", { ascending: true }).limit(3),
         supabase.from("places").select("id, name, area, entry, student_score, category"),
+        supabase.from("bundles").select("*").order("popular", { ascending: false }).limit(4),
       ]);
       setCheap((food.data ?? []) as FoodPlace[]);
+      setBundles((bundlesRes.data ?? []) as Bundle[]);
       const rows = (places.data ?? []) as Place[];
       // Tonight's pick: free entry first, then highest student score.
       const best = [...rows].sort(
@@ -128,6 +131,41 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Bundles */}
+      {bundles.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <h2 className="t-title text-ink">Student bundles</h2>
+            <Link href="/bundles" className="t-label text-live">
+              See all
+            </Link>
+          </div>
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+            {bundles.map((b) => (
+              <Link
+                key={b.id}
+                href="/bundles"
+                className="relative flex min-w-[170px] shrink-0 flex-col gap-2 rounded-card border border-line bg-surface p-4 shadow-card"
+              >
+                {b.popular && (
+                  <span className="t-micro absolute right-3 top-3 rounded-full bg-live px-2 py-0.5 text-white">
+                    POPULAR
+                  </span>
+                )}
+                <p className="t-subtitle truncate pr-12 text-ink">{b.name}</p>
+                <p className="t-label truncate text-muted">{b.tagline}</p>
+                <div className="flex items-end gap-2">
+                  <span className="t-stat self-start rounded-full bg-live px-3 py-1 text-white" style={{ fontSize: "18px" }}>
+                    {inr(b.price)}
+                  </span>
+                  <span className="t-micro text-muted line-through">{inr(b.mrp)}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Tonight's pick */}
       {pick && (
