@@ -8,17 +8,19 @@ import { EatTab } from "@/components/eat-tab";
 import { LaundryTab } from "@/components/laundry-tab";
 import { BundlesTab } from "@/components/bundles-tab";
 import { HousingTab } from "@/components/housing-tab";
+import { MedicalTab } from "@/components/medical-tab";
 
 const LIVE = MODULE_BY_KEY.live;
 const TABS: Chip[] = [
   { key: "eat", label: "Eat" },
   { key: "laundry", label: "Laundry" },
   { key: "housing", label: "PG & Hostels" },
+  { key: "medical", label: "Medical" },
   { key: "bundles", label: "Bundles" },
 ];
 
 // /live (29C, clay) is the combined hub — reference-app parity: Eat + Laundry
-// share one screen there too. Housing + Bundles are our own additions.
+// share one screen there too. Housing, Medical + Bundles are our own additions.
 export default function LivePage() {
   return (
     <Suspense fallback={<div className="px-4 py-6 t-body text-muted">Loading…</div>}>
@@ -46,6 +48,8 @@ function ServicesHub() {
         <LaundryTab />
       ) : tab === "housing" ? (
         <HousingTab />
+      ) : tab === "medical" ? (
+        <MedicalTab />
       ) : (
         <BundlesTab />
       )}
