@@ -28,8 +28,9 @@ export function DetailSheet({
   /** Optional hero photo shown above the name. */
   image?: string;
   phone?: string | null;
-  saved: boolean;
-  onToggleSave: () => void;
+  /** Omit both to hide the Save button entirely (e.g. entity types with no `saves` support). */
+  saved?: boolean;
+  onToggleSave?: () => void;
   children?: ReactNode;
 }) {
   const directions = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
@@ -84,15 +85,17 @@ export function DetailSheet({
                 <MapPin size={18} /> Directions
               </a>
             </div>
-            <button
-              type="button"
-              onClick={onToggleSave}
-              className={`t-subtitle mt-2 flex w-full items-center justify-center gap-2 rounded-full py-3 ${
-                saved ? `${module.bgClass} ${module.onColorClass}` : "bg-speak text-white"
-              }`}
-            >
-              <Bookmark size={18} /> {saved ? "Saved" : "Save"}
-            </button>
+            {onToggleSave && (
+              <button
+                type="button"
+                onClick={onToggleSave}
+                className={`t-subtitle mt-2 flex w-full items-center justify-center gap-2 rounded-full py-3 ${
+                  saved ? `${module.bgClass} ${module.onColorClass}` : "bg-speak text-white"
+                }`}
+              >
+                <Bookmark size={18} /> {saved ? "Saved" : "Save"}
+              </button>
+            )}
           </motion.div>
         </motion.div>
       )}
