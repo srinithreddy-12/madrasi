@@ -87,7 +87,7 @@ export function DailyQuiz({ phrases }: { phrases: Phrase[] }) {
       <div className="rounded-card bg-speak-tint p-card">
         <p className="t-micro text-muted">Today&apos;s quiz</p>
         <p className="t-stat mt-1 text-speak">{correct}/{quiz.length}</p>
-        <p className="t-label text-ink">+{correct * 10} XP on Speak</p>
+        <p className="t-label text-ink">+{correct * 10} XP on Tamil</p>
       </div>
     );
   }

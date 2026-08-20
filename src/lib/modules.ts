@@ -32,7 +32,7 @@ export type ModuleDef = {
 export const MODULES: ModuleDef[] = [
   {
     key: "eat",
-    label: "Eat",
+    label: "Food",
     routeCode: "21G",
     path: "/live?tab=eat",
     icon: Utensils,
@@ -45,7 +45,7 @@ export const MODULES: ModuleDef[] = [
   },
   {
     key: "speak",
-    label: "Speak",
+    label: "Tamil",
     routeCode: "5C",
     path: "/speak",
     icon: Languages,
@@ -58,7 +58,7 @@ export const MODULES: ModuleDef[] = [
   },
   {
     key: "move",
-    label: "Move",
+    label: "Travel",
     routeCode: "23C",
     path: "/move",
     icon: Bus,

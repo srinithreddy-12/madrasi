@@ -63,8 +63,8 @@ export default function FareShieldPage() {
         routeCode="23C"
         accentClass="bg-move"
         accentText="text-white"
-        subtitle="Move"
-        back={{ href: "/move", label: "Move" }}
+        subtitle="Travel"
+        back={{ href: "/move", label: "Travel" }}
       />
 
       {/* Inputs */}
@@ -126,7 +126,7 @@ export default function FareShieldPage() {
         <div className="rounded-card bg-move-tint p-card">
           <p className="t-body text-ink">
             Nice — <span className="text-live">{inr(saved)}</span> logged and{" "}
-            <span className="text-move">+{MOVE_XP} XP</span> on Move.
+            <span className="text-move">+{MOVE_XP} XP</span> on Travel.
           </p>
         </div>
       ) : outcome === "nowin" ? (

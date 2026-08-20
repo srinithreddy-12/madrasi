@@ -73,7 +73,7 @@ export function DetailSheet({
                   href={`tel:${phone}`}
                   className="t-subtitle flex flex-1 items-center justify-center gap-2 rounded-full border border-line py-3 text-ink"
                 >
-                  <Phone size={18} /> Call
+                  <Phone size={18} /> Call the shop
                 </a>
               )}
               <a
@@ -82,7 +82,7 @@ export function DetailSheet({
                 rel="noopener noreferrer"
                 className="t-subtitle flex flex-1 items-center justify-center gap-2 rounded-full border border-line py-3 text-ink"
               >
-                <MapPin size={18} /> Directions
+                <MapPin size={18} /> Open in Maps
               </a>
             </div>
             {onToggleSave && (
@@ -93,7 +93,7 @@ export function DetailSheet({
                   saved ? `${module.bgClass} ${module.onColorClass}` : "bg-speak text-white"
                 }`}
               >
-                <Bookmark size={18} /> {saved ? "Saved" : "Save"}
+                <Bookmark size={18} /> {saved ? "Saved" : "Save for later"}
               </button>
             )}
           </motion.div>

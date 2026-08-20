@@ -11,13 +11,13 @@ import { startDictation, speechRecognitionSupported } from "@/lib/voice";
 import { MODULE_BY_KEY, type ModuleKey } from "@/lib/modules";
 
 const PRESETS = [
-  "Dinner under ₹100 near me",
+  "Where can I eat for under ₹100?",
   'How do I say "stop here" in Tamil?',
-  "Cheapest way to Chennai Central",
-  "Nearest 24×7 pharmacy",
-  "Fair auto fare to T. Nagar",
-  "Mess under ₹3000 a month",
-  "What do I need for day one at a hostel?",
+  "What's the cheapest way to Chennai Central?",
+  "What should an auto to T. Nagar cost?",
+  "Which mess is under ₹3,000 a month?",
+  "What do I need for my first day in a hostel?",
+  "Where's the nearest 24×7 pharmacy?",
 ];
 
 type Msg = { role: "user" | "assistant"; content: string; module?: ModuleKey };

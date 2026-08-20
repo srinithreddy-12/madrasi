@@ -120,7 +120,7 @@ export function TranslatePanel() {
           disabled={status === "loading"}
           className="t-subtitle rounded-full bg-speak px-5 text-white disabled:opacity-60"
         >
-          {status === "loading" ? "…" : "Go"}
+          {status === "loading" ? "…" : "Translate"}
         </button>
       </form>
 

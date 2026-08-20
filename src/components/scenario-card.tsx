@@ -100,7 +100,7 @@ export function ScenarioCard({ scenario }: { scenario: Scenario }) {
                 onClick={playAll}
                 className="t-chip flex items-center gap-1.5 rounded-full bg-speak px-4 py-2 text-white"
               >
-                <Play size={14} /> Play conversation
+                <Play size={14} /> Play the whole conversation
               </button>
             )}
             <button

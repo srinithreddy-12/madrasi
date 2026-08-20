@@ -12,7 +12,7 @@ import { NavHeader } from "@/components/nav-header";
 
 const LIVE = MODULE_BY_KEY.live;
 const TABS: Chip[] = [
-  { key: "eat", label: "Eat" },
+  { key: "eat", label: "Food" },
   { key: "laundry", label: "Laundry" },
   { key: "housing", label: "PG & Hostels" },
   { key: "medical", label: "Medical" },
@@ -40,7 +40,7 @@ function ServicesHub() {
         routeCode="29C"
         accentClass={LIVE.bgClass}
         accentText={LIVE.onColorClass}
-        subtitle="Food, laundry, housing & medical"
+        subtitle="Laundry, and things you need for your room"
       />
 
       <FilterChips chips={TABS} value={tab} onChange={setTab} module={LIVE} />

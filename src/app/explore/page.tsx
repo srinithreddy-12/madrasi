@@ -95,7 +95,7 @@ export default function ExplorePage() {
         routeCode="1B"
         accentClass={EXPLORE.bgClass}
         accentText={EXPLORE.onColorClass}
-        subtitle={ready ? `${list.length} places` : "…"}
+        subtitle="Places worth going, and what they cost"
       />
 
       <FilterChips chips={tabs} value={tab} onChange={setTab} module={EXPLORE} />
@@ -139,7 +139,7 @@ export default function ExplorePage() {
               href={`/move?to=${encodeURIComponent(detail.area)}`}
               className="t-subtitle mt-3 flex items-center justify-center gap-2 rounded-full bg-explore-tint py-3 text-explore"
             >
-              <Route size={18} /> How do I get there?
+              <Route size={18} /> See how to get there
             </Link>
             {detail.tags.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">

@@ -184,7 +184,11 @@ export default function ProfilePage() {
 
   return (
     <div className="screen gap-4">
-      <NavHeader title="Profile" back={{ href: "/", label: "Home" }} />
+      <NavHeader
+        title="You"
+        subtitle="Your progress, your saves, your settings"
+        back={{ href: "/", label: "Home" }}
+      />
 
       {/* Editable identity */}
       <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-card shadow-card">

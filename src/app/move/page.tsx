@@ -181,11 +181,11 @@ function MovePlanner() {
   return (
     <div className="screen gap-4">
       <NavHeader
-        title="Move"
+        title="Travel"
         routeCode="23C"
         accentClass="bg-move"
         accentText="text-white"
-        subtitle="Metro, buses, trains, autos — decoded"
+        subtitle="What each way of getting there costs"
       />
 
       {/* Route planner */}
@@ -216,7 +216,7 @@ function MovePlanner() {
           disabled={from === to}
           className="t-subtitle mt-1 flex h-11 items-center justify-center gap-2 rounded-full bg-move text-white disabled:opacity-50"
         >
-          Find routes →
+          Compare the options
         </button>
       </div>
 
@@ -268,7 +268,7 @@ function MovePlanner() {
       {/* Cost calculator */}
       <div>
         <p className="t-label mb-2 flex items-center gap-1.5 text-muted">
-          <Calculator size={15} strokeWidth={2} /> Cost calculator
+          <Calculator size={15} strokeWidth={2} /> Drag to your distance
         </p>
         <div className="rounded-card border border-line bg-surface p-card shadow-card">
           <div className="flex items-baseline justify-between">

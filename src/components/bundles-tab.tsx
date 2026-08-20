@@ -83,7 +83,7 @@ export function BundlesTab() {
               onClick={() => setReserve(b)}
               className="t-subtitle w-full rounded-full bg-live py-3 text-white [transition:transform_120ms_ease-out] active:scale-[0.98]"
             >
-              Reserve this bundle
+              Reserve — we&apos;ll message you on WhatsApp
             </button>
           </div>
         ))

@@ -102,11 +102,11 @@ export default function SpeakPage() {
   return (
     <div className="screen gap-4">
       <NavHeader
-        title="Speak"
+        title="Tamil"
         routeCode="5C"
         accentClass={SPEAK.bgClass}
         accentText={SPEAK.onColorClass}
-        subtitle="Chennai Tamil"
+        subtitle="Enough Tamil to get through the day"
       />
       {noTamilVoice && (
         <p className="t-micro -mt-2 text-muted">
@@ -119,7 +119,7 @@ export default function SpeakPage() {
 
       {/* Real Situations */}
       <section className="flex flex-col gap-3">
-        <h2 className="t-title text-ink">Real situations</h2>
+        <h2 className="t-title text-ink">Conversations you&apos;ll actually have</h2>
         {scenarios.map((s) => (
           <ScenarioCard key={s.id} scenario={s} />
         ))}
@@ -127,7 +127,7 @@ export default function SpeakPage() {
 
       {/* Phrasebook */}
       <section className="flex flex-col gap-3">
-        <h2 className="t-title text-ink">Phrasebook</h2>
+        <h2 className="t-title text-ink">Lines by situation</h2>
         {situationChips.length > 0 && (
           <FilterChips chips={situationChips} value={situation} onChange={setSituation} module={SPEAK} />
         )}
@@ -138,7 +138,7 @@ export default function SpeakPage() {
 
       {/* Lessons */}
       <section className="flex flex-col gap-3">
-        <h2 className="t-title text-ink">Lessons</h2>
+        <h2 className="t-title text-ink">Short lessons — a few words each</h2>
         <div className="grid grid-cols-2 gap-2">
           {lessons.map((l) => (
             <LessonCard
@@ -202,7 +202,7 @@ function LessonCard({
       <p className="t-micro text-muted">{lesson.phrase_ids.length} phrases</p>
       <p className="t-label text-speak">+{lesson.xp} XP</p>
       <p className="t-micro mt-1 text-muted">
-        {completed ? "Completed" : playing ? "Playing…" : "Tap to learn"}
+        {completed ? "Completed" : playing ? "Playing…" : "Not started"}
       </p>
     </button>
   );

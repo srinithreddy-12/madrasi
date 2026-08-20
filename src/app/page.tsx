@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, MapPin } from "lucide-react";
@@ -13,7 +13,6 @@ import type { Bundle, FoodPlace } from "@/lib/types";
 import { getAvatar } from "@/lib/avatars";
 import { isOnboarded } from "@/lib/onboarding";
 import { GreetingRow } from "@/components/greeting-row";
-import { StatTrio } from "@/components/stat-trio";
 import { ModuleTile } from "@/components/module-tile";
 
 type Place = {
@@ -25,11 +24,13 @@ type Place = {
   category: string;
 };
 
-function quizPlayedToday(): boolean {
-  if (typeof window === "undefined") return false;
-  const d = new Date();
-  return !!localStorage.getItem(`madrasi_quiz_${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`);
-}
+// One plain line per module row (CLARITY §"five module rows on Home").
+const ROW_BLURBS: Record<string, string> = {
+  speak: "Type English, hear it spoken in Tamil",
+  move: "Compare what a bus, metro, auto and cab each cost",
+  live: "Laundry by the kilo, and starter kits for your room",
+  explore: "Beaches, temples and outings that fit a student budget",
+};
 
 const mapsLink = (name: string, area: string) =>
   `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${name}, ${area}, Chennai`)}`;
@@ -43,10 +44,8 @@ export default function HomePage() {
   const [cheap, setCheap] = useState<FoodPlace[]>([]);
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [pick, setPick] = useState<Place | null>(null);
-  const [quizDone, setQuizDone] = useState(true);
 
   useEffect(() => {
-    setQuizDone(quizPlayedToday());
     (async () => {
       const [food, places, bundlesRes] = await Promise.all([
         supabase.from("food_places").select("*").order("avg_price", { ascending: true }).limit(3),
@@ -82,42 +81,33 @@ export default function HomePage() {
         avatar={userId ? getAvatar(userId) : undefined}
         right={
           <Link href="/profile" className="t-chip flex h-9 items-center gap-1 rounded-full bg-speak px-4 text-white">
-            Profile <ArrowRight size={14} />
+            You <ArrowRight size={14} />
           </Link>
         }
       />
 
-      <StatTrio
-        items={[
-          { value: level, label: "Level" },
-          { value: progress?.totalXp ?? 0, label: "XP" },
-          { value: progress?.profile?.streak ?? 0, label: "Day streak" },
-        ]}
-      />
+      {/* The only game number on Home — a quiet line to the full scoreboard. */}
+      <Link href="/profile" className="t-label -mt-1 w-fit text-muted">
+        Level {level} · {progress?.profile?.streak ?? 0}-day streak
+      </Link>
 
-      {/* Today's quiz shortcut (if unplayed) */}
-      {!quizDone && (
-        <Link href="/speak" className="pressable block rounded-block bg-live p-card text-white">
-          <p className="t-micro opacity-70">Today&apos;s quiz</p>
-          <p className="t-title mt-1">3 quick questions · +30 XP</p>
-          <p className="t-label mt-2 opacity-90">Tap to play →</p>
-        </Link>
-      )}
-
-      {/* Module tiles — Eat lives inside Services now, no standalone /eat page */}
-      <div className="grid grid-cols-2 gap-2">
+      {/* Module rows — Eat lives inside Services now, no standalone /eat page */}
+      <div className="mt-1 flex flex-col gap-2">
         {MODULES.filter((m) => m.key !== "eat").map((m) => (
-          <ModuleTile key={m.key} module={m} progress={`${progress?.axes[m.key] ?? 0}%`} />
+          <ModuleTile key={m.key} module={m} subtitle={ROW_BLURBS[m.key]} />
         ))}
       </div>
 
-      {/* Under ₹100 near you */}
+      {/* Food options under ₹100 near you */}
       <section className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <h2 className="t-title text-ink">Under ₹100 near you</h2>
-          <Link href="/live?tab=eat&cap=100" className="t-label text-eat">
-            See all
-          </Link>
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="t-title text-ink">Food options under ₹100 near you</h2>
+            <Link href="/live?tab=eat&cap=100" className="t-label shrink-0 text-eat">
+              See all
+            </Link>
+          </div>
+          <p className="t-caption text-muted">Cheap places students actually eat at, closest first.</p>
         </div>
         <div className="-mx-3.5 flex gap-2 overflow-x-auto px-3.5 pb-1">
           {cheap.map((f) => (
@@ -139,11 +129,16 @@ export default function HomePage() {
       {/* Bundles */}
       {bundles.length > 0 && (
         <section className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <h2 className="t-title text-ink">Student bundles</h2>
-            <Link href="/bundles" className="t-label text-live">
-              See all
-            </Link>
+          <div>
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="t-title text-ink">Supply bundles that you can buy from here</h2>
+              <Link href="/bundles" className="t-label shrink-0 text-live">
+                See all
+              </Link>
+            </div>
+            <p className="t-caption text-muted">
+              Starter kits shipped to your hostel — cheaper than buying each thing separately.
+            </p>
           </div>
           <div className="-mx-3.5 flex gap-2 overflow-x-auto px-3.5 pb-1">
             {bundles.map((b) => (
@@ -171,10 +166,13 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Tonight's pick */}
+      {/* Worth going this week */}
       {pick && (
         <section className="flex flex-col gap-2">
-          <h2 className="t-title text-ink">Tonight&apos;s pick</h2>
+          <div>
+            <h2 className="t-title text-ink">Worth going this week</h2>
+            <p className="t-caption text-muted">A place near you that costs little or nothing.</p>
+          </div>
           <div className="flex flex-col gap-2 rounded-block bg-explore-tint p-card">
             <div>
               <p className="t-subtitle text-ink">{pick.name}</p>
@@ -188,7 +186,7 @@ export default function HomePage() {
               rel="noopener noreferrer"
               className="t-subtitle flex items-center justify-center gap-2 rounded-full bg-explore py-3 text-white"
             >
-              <MapPin size={18} /> Directions
+              <MapPin size={18} /> Open in Maps
             </a>
           </div>
         </section>

@@ -19,13 +19,13 @@ const cuisineLabel = (c: FoodPlace["cuisine"]) =>
 const EAT = MODULE_BY_KEY.eat;
 const TABS: Chip[] = [
   { key: "food", label: "Food" },
-  { key: "mess", label: "Mess & Tiffin" },
-  { key: "late", label: "Late Night" },
+  { key: "mess", label: "Monthly meal plans" },
+  { key: "late", label: "Open after 10 PM" },
 ];
 
 const isMess = (p: FoodPlace) => ["mess", "tiffin", "caterer"].includes(p.kind);
 const priceLabel = (p: FoodPlace) =>
-  isMess(p) && p.monthly_price ? `${inr(p.monthly_price)}/mo` : `${inr(p.avg_price)}`;
+  isMess(p) && p.monthly_price ? `${inr(p.monthly_price)} a month` : `${inr(p.avg_price)}`;
 
 // Formerly the standalone /eat page — now the default tab inside Services,
 // same as the reference app's Food+Laundry combined /services screen.
@@ -116,7 +116,7 @@ export function EatTab() {
           >
             <div className="mt-3 flex items-center gap-3">
               <VegDot cuisine={p.cuisine} />
-              <span className="t-micro text-muted">Score {p.student_score}</span>
+              <span className="t-micro text-muted">Student rating {p.student_score}</span>
               {saved.has(p.id) && <span className="t-micro text-eat">Saved</span>}
             </div>
           </ContentCard>
@@ -137,7 +137,7 @@ export function EatTab() {
           <>
             <p className="t-stat text-eat">{priceLabel(detail)}</p>
             {isMess(detail) && detail.monthly_price && (
-              <p className="t-label text-muted">≈ {inr(Math.round(detail.monthly_price / 90))}/meal</p>
+              <p className="t-label text-muted">({inr(Math.round(detail.monthly_price / 90))} a meal)</p>
             )}
 
             {detail.tags.length > 0 && (
