@@ -89,7 +89,7 @@ export function Assistant() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Ask MADRASI"
+        aria-label="Ask Circle"
         className="pressable shadow-pop fixed bottom-[calc(76px+env(safe-area-inset-bottom))] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-speak text-white"
       >
         <MessageCircle size={24} />
@@ -106,7 +106,7 @@ export function Assistant() {
             <button aria-label="Close" onClick={() => setOpen(false)} className="scrim absolute inset-0" />
             <motion.div
               role="dialog"
-              aria-label="MADRASI assistant"
+              aria-label="Circle assistant"
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
@@ -115,7 +115,7 @@ export function Assistant() {
             >
               <div aria-hidden="true" className="mx-auto mt-2 h-1.5 w-11 rounded-full bg-line-strong" />
               <div className="flex items-center justify-between px-5 pb-2 pt-3">
-                <p className="t-title text-ink">Ask MADRASI</p>
+                <p className="t-title text-ink">Ask Circle</p>
                 <button onClick={() => setOpen(false)} aria-label="Close">
                   <X size={22} className="text-muted" />
                 </button>

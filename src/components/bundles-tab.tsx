@@ -35,7 +35,7 @@ export function BundlesTab() {
 
   const waLink = (b: Bundle) =>
     `https://wa.me/?text=${encodeURIComponent(
-      `Hi MADRASI — I'd like to reserve the "${b.name}" bundle (${inr(b.price)}). Please confirm delivery.`,
+      `Hi Circle — I'd like to reserve the "${b.name}" bundle (${inr(b.price)}). Please confirm delivery.`,
     )}`;
 
   return (
@@ -91,7 +91,7 @@ export function BundlesTab() {
 
       {ready && bundles.length > 0 && (
         <p className="t-micro px-1 text-muted">
-          Fulfilled by verified wholesale partners. MADRASI earns 15–20% commission.
+          Fulfilled by verified wholesale partners. Circle earns 15–20% commission.
         </p>
       )}
 

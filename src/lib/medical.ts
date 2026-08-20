@@ -1,4 +1,4 @@
-// Pharmacies & hospitals for Services — no MADRASI Supabase table for this
+// Pharmacies & hospitals for Services — no Circle Supabase table for this
 // yet, so static TS data (same pattern as bus-routes.ts / hostels.ts).
 // Pharmacies #7–12 plus the three "top choices" are from a ranked student
 // pharmacy list screenshot; the rest fill out areas the app already covers

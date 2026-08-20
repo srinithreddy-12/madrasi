@@ -1,4 +1,4 @@
-// PG & hostel listings for students — no MADRASI Supabase table for this yet,
+// PG & hostel listings for students — no Circle Supabase table for this yet,
 // so this stays static TS data (same pattern as bus-routes.ts) rather than
 // forcing a schema change for content mostly sourced from a ranked screenshot.
 // The top 3 rows had fully confirmed amenities/pricing in the source; the
@@ -11,7 +11,7 @@ export type Hostel = {
   area: string;
   gender: "men" | "women" | "any";
   rating: number | null; // public rating, out of 5 — null where the source had none
-  studentRating: number; // MADRASI-scale /10 from the source ranking
+  studentRating: number; // Circle-scale /10 from the source ranking
   priceLabel: string;
   priceVerified: boolean;
   amenities: {

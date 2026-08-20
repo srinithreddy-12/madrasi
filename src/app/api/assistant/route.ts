@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 
-// POST /api/assistant — MADRASI guide (SPRINT-ADD Block H). Anthropic API with
+// POST /api/assistant — Circle guide (SPRINT-ADD Block H). Anthropic API with
 // the same key as translate. Seeded content (food/laundry/bundles, compact) is
 // passed as context. Plain-text reply; the client detects any module mentioned
 // and shows a deep-link chip.
@@ -9,7 +9,7 @@ import { createClient } from "@supabase/supabase-js";
 export const runtime = "nodejs";
 
 const SYSTEM =
-  "You are MADRASI, a guide for outstation students new to Chennai. Answer in " +
+  "You are Circle, a guide for outstation students new to Chennai. Answer in " +
   "2-3 short sentences. Be specific about prices in rupees and areas in Chennai. " +
   "If the student needs food, laundry, medical, transport or Tamil help, say " +
   "which section of the app to open.";
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     const msg = await client.messages.create({
       model: "claude-haiku-4-5",
       max_tokens: 300,
-      system: `${SYSTEM}\n\nCurrent MADRASI content you can cite:\n${context}`,
+      system: `${SYSTEM}\n\nCurrent Circle content you can cite:\n${context}`,
       messages: trimmed,
     });
     const block = msg.content.find((b) => b.type === "text");

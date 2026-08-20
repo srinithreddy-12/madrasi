@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import { Utensils, Languages, Bus, WashingMachine, Compass } from "lucide-react";
 
-// The five MADRASI modules. STYLE-v2: one colour per module — a user should
+// The five Circle modules. STYLE-v2: one colour per module — a user should
 // know which module they're in from the colour alone. Route numbers stay as
 // content. Class strings are literal so Tailwind's scanner keeps them.
 //

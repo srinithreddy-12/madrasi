@@ -29,7 +29,7 @@ const anekTamil = Anek_Tamil({
 });
 
 export const metadata: Metadata = {
-  title: "MADRASI",
+  title: "Circle",
   description: "A student survival companion for Chennai.",
 };
 

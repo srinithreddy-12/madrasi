@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
-  MADRASI design tokens — "Soft Blocks", refined against Apple HIG.
+  Circle design tokens — "Soft Blocks", refined against Apple HIG.
   Warm off-white page, one colour per module, huge numerals, rings not bars.
   This pass adds: a layered depth system, an iOS-style large title, translucent
   navigation materials, and system-standard focus rings. Light and clean.
