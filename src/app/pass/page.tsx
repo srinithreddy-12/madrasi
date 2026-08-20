@@ -11,6 +11,7 @@ import { StatTrio } from "@/components/stat-trio";
 import { ProgressRing } from "@/components/progress-ring";
 import { CountUp } from "@/components/count-up";
 import { BadgeChip } from "@/components/badge-chip";
+import { NavHeader } from "@/components/nav-header";
 
 type LedgerRow = {
   id: string;
@@ -71,12 +72,10 @@ export default function PassPage() {
 
   return (
     <div className="flex flex-col gap-3 px-4 py-4">
-      <div>
-        <h1 className="t-hero text-ink">{profile?.display_name ?? "Your"} pass</h1>
-        <p className="t-label text-muted">
-          {(college ?? "No college").toString()} · {profile?.area ?? "—"}
-        </p>
-      </div>
+      <NavHeader
+        title={`${profile?.display_name ?? "Your"} pass`}
+        subtitle={`${(college ?? "No college").toString()} · ${profile?.area ?? "—"}`}
+      />
 
       <StatTrio
         items={[

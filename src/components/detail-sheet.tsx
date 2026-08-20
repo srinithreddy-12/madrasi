@@ -46,17 +46,17 @@ export function DetailSheet({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <button aria-label="Close" onClick={onClose} className="absolute inset-0 bg-ink/40" />
+          <button aria-label="Close" onClick={onClose} className="scrim absolute inset-0" />
           <motion.div
             role="dialog"
             aria-label={`${name} details`}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{ type: "tween", duration: 0.28, ease: "easeOut" }}
-            className="relative z-10 max-h-[85dvh] w-full max-w-[440px] overflow-y-auto rounded-t-[28px] bg-surface p-5"
+            transition={{ type: "spring", stiffness: 380, damping: 36 }}
+            className="shadow-raised relative z-10 max-h-[88dvh] w-full max-w-[440px] overflow-y-auto rounded-t-[28px] bg-surface p-5 pb-[calc(env(safe-area-inset-bottom)+20px)]"
           >
-            <div aria-hidden="true" className="mx-auto mb-3 h-1 w-10 rounded-full bg-line" />
+            <div aria-hidden="true" className="mx-auto mb-4 h-1.5 w-11 rounded-full bg-line-strong" />
             {image && (
               <div className="relative mb-4 h-44 w-full overflow-hidden rounded-inner">
                 <Image src={image} alt={name} fill sizes="440px" className="object-cover" />

@@ -88,7 +88,7 @@ export default function HomePage() {
 
       {/* Today's quiz shortcut (if unplayed) */}
       {!quizDone && (
-        <Link href="/speak" className="rounded-block bg-live p-5 text-white [transition:transform_120ms_ease-out] active:scale-[0.99]">
+        <Link href="/speak" className="pressable block rounded-block bg-live p-5 text-white">
           <p className="t-micro opacity-70">Today&apos;s quiz</p>
           <p className="t-title mt-1">3 quick questions · +30 XP</p>
           <p className="t-label mt-2 opacity-90">Tap to play →</p>
@@ -115,7 +115,7 @@ export default function HomePage() {
             <Link
               key={f.id}
               href="/live?tab=eat&cap=100"
-              className="flex min-w-[160px] shrink-0 flex-col gap-2 rounded-card border border-line bg-surface p-4 shadow-card"
+              className="pressable flex min-w-[160px] shrink-0 flex-col gap-2 rounded-card border border-line bg-surface p-4 shadow-card"
             >
               <p className="t-subtitle truncate text-ink">{f.name}</p>
               <p className="t-label text-muted">{f.area}</p>

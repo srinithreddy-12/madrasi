@@ -35,6 +35,9 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#f6f3ee",
+  // Edge-to-edge so the translucent tab bar has content to blur beneath and
+  // safe-area insets resolve correctly on notched devices (HIG: Layout > Safe areas).
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

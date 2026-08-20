@@ -2,11 +2,22 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import {
+  ChevronDown,
+  Train,
+  Bus,
+  Car,
+  Users,
+  Calculator,
+  BookOpen,
+  Route as RouteIcon,
+  type LucideIcon,
+} from "lucide-react";
 import { fairFare } from "@/lib/fare";
 import { inr } from "@/lib/format";
 import { BUS_ROUTES } from "@/lib/bus-routes";
 import { AREAS, resolveArea, roadKm } from "@/lib/areas";
+import { NavHeader } from "@/components/nav-header";
 
 // MOVE (DEMO-SPRINT Block C + reference-app parity): route planner, cost
 // calculator, a "new to Chennai" transit guide, and a bus-route reference.
@@ -26,7 +37,7 @@ const MODES: { key: string; label: string; note: string; fare: (km: number) => n
 
 type RouteOption = {
   key: string;
-  emoji: string;
+  Icon: LucideIcon;
   label: string;
   minutes: number;
   walkM: number;
@@ -39,7 +50,7 @@ function buildRouteOptions(from: string, to: string): RouteOption[] {
   return [
     {
       key: "metro",
-      emoji: "🚇",
+      Icon: Train,
       label: "Metro + walk",
       minutes: Math.round(8 + (km / 35) * 60),
       walkM: 700,
@@ -52,7 +63,7 @@ function buildRouteOptions(from: string, to: string): RouteOption[] {
     },
     {
       key: "bus",
-      emoji: "🚌",
+      Icon: Bus,
       label: "MTC bus",
       minutes: Math.round(6 + (km / 15) * 60),
       walkM: 500,
@@ -65,7 +76,7 @@ function buildRouteOptions(from: string, to: string): RouteOption[] {
     },
     {
       key: "share",
-      emoji: "🛺",
+      Icon: Users,
       label: "Share auto",
       minutes: Math.round(4 + (km / 18) * 60),
       walkM: 300,
@@ -78,7 +89,7 @@ function buildRouteOptions(from: string, to: string): RouteOption[] {
     },
     {
       key: "cab",
-      emoji: "🚕",
+      Icon: Car,
       label: "Cab",
       minutes: Math.round(5 + (km / 25) * 60),
       walkM: 0,
@@ -88,9 +99,9 @@ function buildRouteOptions(from: string, to: string): RouteOption[] {
   ];
 }
 
-const GUIDE_CARDS = [
+const GUIDE_CARDS: { Icon: LucideIcon; title: string; points: string[] }[] = [
   {
-    emoji: "🚇",
+    Icon: Train,
     title: "Chennai Metro 101",
     points: [
       "Two lines: Blue (Airport ↔ Wimco Nagar) and Green (Chennai Central ↔ St. Thomas Mount).",
@@ -99,7 +110,7 @@ const GUIDE_CARDS = [
     ],
   },
   {
-    emoji: "🚌",
+    Icon: Bus,
     title: "MTC buses without fear",
     points: [
       "Ordinary (white) is cheapest, deluxe (green) costs a bit more, express (blue) skips stops.",
@@ -108,7 +119,7 @@ const GUIDE_CARDS = [
     ],
   },
   {
-    emoji: "🚆",
+    Icon: RouteIcon,
     title: "Suburban trains",
     points: [
       "Beach–Tambaram and Beach–Chengalpattu lines cover most student areas.",
@@ -169,10 +180,13 @@ function MovePlanner() {
 
   return (
     <div className="flex flex-col gap-4 px-4 py-4">
-      <div>
-        <h1 className="t-hero text-ink">Move</h1>
-        <p className="t-label text-muted">23C · Metro, buses, trains, autos — decoded</p>
-      </div>
+      <NavHeader
+        title="Move"
+        routeCode="23C"
+        accentClass="bg-move"
+        accentText="text-white"
+        subtitle="Metro, buses, trains, autos — decoded"
+      />
 
       {/* Route planner */}
       <div className="flex flex-col gap-2 rounded-card border border-line bg-surface p-5 shadow-card">
@@ -221,7 +235,9 @@ function MovePlanner() {
                   className="flex w-full items-start justify-between gap-3 text-left"
                 >
                   <div className="min-w-0">
-                    <p className="t-subtitle text-ink">{r.emoji} {r.label}</p>
+                    <p className="t-subtitle flex items-center gap-2 text-ink">
+                      <r.Icon size={18} strokeWidth={2} className="text-move" /> {r.label}
+                    </p>
                     <p className="t-micro mt-0.5 text-muted">
                       {r.minutes} min · {r.walkM} m walk
                     </p>
@@ -251,7 +267,9 @@ function MovePlanner() {
 
       {/* Cost calculator */}
       <div>
-        <p className="t-label mb-2 text-muted">🧮 Cost calculator</p>
+        <p className="t-label mb-2 flex items-center gap-1.5 text-muted">
+          <Calculator size={15} strokeWidth={2} /> Cost calculator
+        </p>
         <div className="rounded-card border border-line bg-surface p-5 shadow-card">
           <div className="flex items-baseline justify-between">
             <span className="t-micro text-muted">Distance</span>
@@ -292,11 +310,15 @@ function MovePlanner() {
 
       {/* New to Chennai? guide */}
       <div>
-        <p className="t-label mb-2 text-muted">📖 New to Chennai?</p>
+        <p className="t-label mb-2 flex items-center gap-1.5 text-muted">
+          <BookOpen size={15} strokeWidth={2} /> New to Chennai?
+        </p>
         <div className="flex flex-col gap-2">
           {GUIDE_CARDS.map((g) => (
             <div key={g.title} className="rounded-card border border-line bg-surface p-4 shadow-card">
-              <p className="t-subtitle text-ink">{g.emoji} {g.title}</p>
+              <p className="t-subtitle flex items-center gap-2 text-ink">
+                <g.Icon size={18} strokeWidth={2} className="text-move" /> {g.title}
+              </p>
               <ul className="mt-2 flex flex-col gap-1.5">
                 {g.points.map((p) => (
                   <li key={p} className="t-label flex gap-2 text-muted">
@@ -312,7 +334,9 @@ function MovePlanner() {
 
       {/* Bus route reference */}
       <div>
-        <p className="t-label mb-2 text-muted">🚌 Useful Chennai bus routes</p>
+        <p className="t-label mb-2 flex items-center gap-1.5 text-muted">
+          <Bus size={15} strokeWidth={2} /> Useful Chennai bus routes
+        </p>
         <div className="flex flex-col gap-2">
           {BUS_ROUTES.map((r) => {
             const open = openBus === r.number;

@@ -1,9 +1,12 @@
 import type { ModuleDef } from "@/lib/modules";
 
+// Horizontal scroll row of pills. Active = module-colour fill with a subtle
+// lift; inactive = white with a hairline border. The active weight also bumps
+// so state doesn't rest on colour alone (HIG: Accessibility > convey with more
+// than colour). Negative margins let the row bleed to the screen edges while
+// the first and last chips stay clear of them.
 export type Chip = { key: string; label: string };
 
-// STYLE-v2 §4: horizontal scroll row. Active = module-colour fill; inactive =
-// white fill with a --line border. 34px tall, 14px horizontal padding.
 export function FilterChips({
   chips,
   value,
@@ -16,7 +19,7 @@ export function FilterChips({
   module: ModuleDef;
 }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1">
+    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {chips.map((c) => {
         const active = c.key === value;
         return (
@@ -25,9 +28,9 @@ export function FilterChips({
             type="button"
             onClick={() => onChange(c.key)}
             aria-pressed={active}
-            className={`t-chip h-[34px] shrink-0 whitespace-nowrap rounded-full border px-3.5 ${
+            className={`t-chip pressable h-9 shrink-0 whitespace-nowrap rounded-full border px-4 ${
               active
-                ? `${module.bgClass} ${module.onColorClass} border-transparent`
+                ? `${module.bgClass} ${module.onColorClass} border-transparent font-semibold shadow-card`
                 : "border-line bg-surface text-ink"
             }`}
           >

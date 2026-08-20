@@ -12,6 +12,7 @@ import { ScenarioCard } from "@/components/scenario-card";
 import { PhraseCard } from "@/components/phrase-card";
 import { DailyQuiz } from "@/components/daily-quiz";
 import { FilterChips, type Chip } from "@/components/filter-chips";
+import { NavHeader } from "@/components/nav-header";
 
 const SPEAK = MODULE_BY_KEY.speak;
 
@@ -100,15 +101,18 @@ export default function SpeakPage() {
 
   return (
     <div className="flex flex-col gap-4 px-4 py-4">
-      <div>
-        <h1 className="t-hero text-ink">Speak</h1>
-        <p className="t-label text-muted">5C · Chennai Tamil</p>
-        {noTamilVoice && (
-          <p className="t-micro mt-1 text-muted">
-            No Tamil voice on this device — playing approximate pronunciation.
-          </p>
-        )}
-      </div>
+      <NavHeader
+        title="Speak"
+        routeCode="5C"
+        accentClass={SPEAK.bgClass}
+        accentText={SPEAK.onColorClass}
+        subtitle="Chennai Tamil"
+      />
+      {noTamilVoice && (
+        <p className="t-micro -mt-2 text-muted">
+          No Tamil voice on this device — playing approximate pronunciation.
+        </p>
+      )}
 
       {/* Translate */}
       <TranslatePanel />

@@ -1,20 +1,24 @@
 import type { ReactNode } from "react";
 import { User } from "lucide-react";
 
-// STYLE-v2 §4: avatar circle · "Hey, Name!" (name bolder) · pill button right.
-// 48px tall, no gradient banner.
+// Home's large-title header: avatar + a quiet eyebrow over the greeting, with
+// one trailing action. Clears the top safe area so it reads as the screen title
+// (HIG: keep primary elements toward the top; use size/weight for hierarchy).
 export function GreetingRow({ name, right }: { name: string; right?: ReactNode }) {
   return (
-    <div className="flex h-12 items-center justify-between">
-      <div className="flex items-center gap-3">
-        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-speak text-white">
-          <User size={20} strokeWidth={2} />
+    <header className="flex items-center justify-between gap-3 pt-[calc(env(safe-area-inset-top)+8px)]">
+      <div className="flex min-w-0 items-center gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-speak text-white shadow-card">
+          <User size={22} strokeWidth={2} />
         </span>
-        <p className="t-subtitle text-ink">
-          Hey, <span className="font-bold">{name}</span>!
-        </p>
+        <div className="min-w-0">
+          <p className="t-micro text-muted">Welcome back</p>
+          <p className="t-hero truncate text-ink">
+            Hey, <span className="font-extrabold">{name}</span>
+          </p>
+        </div>
       </div>
       {right}
-    </div>
+    </header>
   );
 }

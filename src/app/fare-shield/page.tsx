@@ -7,6 +7,7 @@ import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
 import { CHENNAI_NEGOTIATION, fairFare, isNightHour, touristFare } from "@/lib/fare";
 import { inr } from "@/lib/format";
 import { CountUp } from "@/components/count-up";
+import { NavHeader } from "@/components/nav-header";
 
 const MOVE_XP = 15;
 
@@ -57,10 +58,14 @@ export default function FareShieldPage() {
 
   return (
     <div className="flex flex-col gap-3 px-4 py-4">
-      <div>
-        <h1 className="t-hero text-ink">Fare Shield</h1>
-        <p className="t-label text-muted">23C · Move</p>
-      </div>
+      <NavHeader
+        title="Fare Shield"
+        routeCode="23C"
+        accentClass="bg-move"
+        accentText="text-white"
+        subtitle="Move"
+        back={{ href: "/move", label: "Move" }}
+      />
 
       {/* Inputs */}
       <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5 shadow-card">

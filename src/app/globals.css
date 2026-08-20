@@ -1,17 +1,20 @@
 @import "tailwindcss";
 
 /*
-  MADRASI design tokens — STYLE-v2 "Soft Blocks".
+  MADRASI design tokens — "Soft Blocks", refined against Apple HIG.
   Warm off-white page, one colour per module, huge numerals, rings not bars.
-  Light and clean. Never dark, never neon.
+  This pass adds: a layered depth system, an iOS-style large title, translucent
+  navigation materials, and system-standard focus rings. Light and clean.
 */
 :root {
   /* Surfaces — constant everywhere */
   --bg: #f6f3ee; /* warm off-white — THE PAGE */
   --surface: #ffffff; /* card background */
+  --surface-2: #fbf9f5; /* recessed / nested panels, one step off white */
   --ink: #1a1a18; /* all primary text */
   --muted: #6e6a63; /* secondary text (AA on --bg) */
   --line: #e8e3db; /* hairline borders */
+  --line-strong: #ddd6ca; /* separators that need to read on white */
 
   /* Module colours — one per module, the whole system */
   --eat: #e0a32e; /* ochre  · 21G */
@@ -27,15 +30,27 @@
   --live-tint: color-mix(in oklab, var(--live) 12%, var(--bg));
   --explore-tint: color-mix(in oklab, var(--explore) 12%, var(--bg));
 
+  /* Translucent navigation material (HIG: bars float above content). */
+  --material: color-mix(in srgb, var(--bg) 72%, transparent);
+  --material-hairline: color-mix(in srgb, var(--ink) 8%, transparent);
+
+  /* Layered elevation. Cards rest close to the page; sheets and the FAB
+     lift further. Warm-tinted shadow, never a hard grey. */
+  --shadow-card: 0 1px 2px rgba(41, 37, 30, 0.04), 0 4px 12px rgba(41, 37, 30, 0.05);
+  --shadow-raised: 0 2px 6px rgba(41, 37, 30, 0.08), 0 12px 28px rgba(41, 37, 30, 0.1);
+  --shadow-pop: 0 8px 24px -6px rgba(41, 37, 30, 0.28);
+
   color-scheme: light;
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
 
   --color-eat: var(--eat);
   --color-speak: var(--speak);
@@ -80,6 +95,14 @@ body {
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
   }
+  /* Large title — the iOS navigation header. Sits above hero in weight. */
+  .t-largetitle {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 2.125rem; /* 34 */
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
   .t-hero {
     font-family: var(--font-display);
     font-weight: 700;
@@ -92,6 +115,7 @@ body {
     font-weight: 700;
     font-size: 1.375rem; /* 22 */
     line-height: 1.25;
+    letter-spacing: -0.01em;
   }
   .t-subtitle {
     font-family: var(--font-display);
@@ -126,9 +150,52 @@ body {
     letter-spacing: 0.06em;
   }
 
-  /* Soft shadow — white cards only. Colour blocks get none. */
+  /* Depth utilities. White cards rest; raised = sheets / popovers. */
   .shadow-card {
-    box-shadow: 0 2px 8px rgba(26, 26, 24, 0.06);
+    box-shadow: var(--shadow-card);
+  }
+  .shadow-raised {
+    box-shadow: var(--shadow-raised);
+  }
+  .shadow-pop {
+    box-shadow: var(--shadow-pop);
+  }
+
+  /* Translucent navigation material — for the tab bar and sticky headers.
+     Content scrolls beneath it (HIG: Layout > Visual hierarchy). */
+  .material-bar {
+    background: var(--material);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+  }
+
+  /* A softer scrim behind modal sheets than a flat wash. */
+  .scrim {
+    background: rgba(26, 26, 24, 0.32);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+  }
+
+  /* Standard pressable feedback — transform only, honours reduced motion. */
+  .pressable {
+    transition: transform 140ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  .pressable:active {
+    transform: scale(0.97);
+  }
+}
+
+/* Keyboard focus ring, system-standard. Pointer taps don't trigger it. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--move) 70%, transparent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Fallback backdrop tint where blur isn't supported — keep bars opaque. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .material-bar {
+    background: color-mix(in srgb, var(--bg) 94%, transparent);
   }
 }
 

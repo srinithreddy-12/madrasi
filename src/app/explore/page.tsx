@@ -12,6 +12,7 @@ import { awardFirstSaveXp } from "@/lib/xp";
 import { ContentCard } from "@/components/content-card";
 import { FilterChips, type Chip } from "@/components/filter-chips";
 import { DetailSheet } from "@/components/detail-sheet";
+import { NavHeader } from "@/components/nav-header";
 
 const EXPLORE = MODULE_BY_KEY.explore;
 
@@ -89,10 +90,13 @@ export default function ExplorePage() {
 
   return (
     <div className="flex flex-col gap-3 px-4 py-4">
-      <div>
-        <h1 className="t-hero text-ink">Explore</h1>
-        <p className="t-label text-muted">1B · {ready ? `${list.length} places` : "…"}</p>
-      </div>
+      <NavHeader
+        title="Explore"
+        routeCode="1B"
+        accentClass={EXPLORE.bgClass}
+        accentText={EXPLORE.onColorClass}
+        subtitle={ready ? `${list.length} places` : "…"}
+      />
 
       <FilterChips chips={tabs} value={tab} onChange={setTab} module={EXPLORE} />
 

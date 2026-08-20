@@ -96,11 +96,7 @@ export function ContentCard({
   }`;
 
   return onClick ? (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`${cls} [transition:transform_120ms_ease-out] active:scale-[0.98]`}
-    >
+    <button type="button" onClick={onClick} className={`${cls} pressable`}>
       {inner}
     </button>
   ) : (

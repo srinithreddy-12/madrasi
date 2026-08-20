@@ -90,7 +90,7 @@ export function Assistant() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Ask MADRASI"
-        className="fixed bottom-[72px] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-speak text-white shadow-[0_6px_16px_-6px_rgba(26,26,24,0.4)]"
+        className="pressable shadow-pop fixed bottom-[calc(76px+env(safe-area-inset-bottom))] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-speak text-white"
       >
         <MessageCircle size={24} />
       </button>
@@ -103,17 +103,18 @@ export function Assistant() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <button aria-label="Close" onClick={() => setOpen(false)} className="absolute inset-0 bg-ink/40" />
+            <button aria-label="Close" onClick={() => setOpen(false)} className="scrim absolute inset-0" />
             <motion.div
               role="dialog"
               aria-label="MADRASI assistant"
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ type: "tween", duration: 0.28, ease: "easeOut" }}
-              className="relative z-10 flex h-[75vh] w-full max-w-[440px] flex-col rounded-t-[28px] bg-bg"
+              transition={{ type: "spring", stiffness: 380, damping: 36 }}
+              className="shadow-raised relative z-10 flex h-[78dvh] w-full max-w-[440px] flex-col rounded-t-[28px] bg-bg"
             >
-              <div className="flex items-center justify-between px-5 pb-2 pt-4">
+              <div aria-hidden="true" className="mx-auto mt-2 h-1.5 w-11 rounded-full bg-line-strong" />
+              <div className="flex items-center justify-between px-5 pb-2 pt-3">
                 <p className="t-title text-ink">Ask MADRASI</p>
                 <button onClick={() => setOpen(false)} aria-label="Close">
                   <X size={22} className="text-muted" />
@@ -179,7 +180,7 @@ export function Assistant() {
                   e.preventDefault();
                   void ask(input);
                 }}
-                className="flex gap-2 border-t border-line p-3"
+                className="flex gap-2 border-t border-line p-3 pb-[calc(12px+env(safe-area-inset-bottom))]"
               >
                 <input
                   value={input}

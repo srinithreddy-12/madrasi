@@ -8,6 +8,7 @@ import { EatTab } from "@/components/eat-tab";
 import { LaundryTab } from "@/components/laundry-tab";
 import { HousingTab } from "@/components/housing-tab";
 import { MedicalTab } from "@/components/medical-tab";
+import { NavHeader } from "@/components/nav-header";
 
 const LIVE = MODULE_BY_KEY.live;
 const TABS: Chip[] = [
@@ -34,10 +35,13 @@ function ServicesHub() {
 
   return (
     <div className="flex flex-col gap-3 px-4 py-4">
-      <div>
-        <h1 className="t-hero text-ink">Services</h1>
-        <p className="t-label text-muted">29C · Food, laundry, housing &amp; medical</p>
-      </div>
+      <NavHeader
+        title="Services"
+        routeCode="29C"
+        accentClass={LIVE.bgClass}
+        accentText={LIVE.onColorClass}
+        subtitle="Food, laundry, housing & medical"
+      />
 
       <FilterChips chips={TABS} value={tab} onChange={setTab} module={LIVE} />
 

@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
 import { loadProgress, type Progress } from "@/lib/progress";
@@ -14,6 +12,7 @@ import { soundEnabled } from "@/lib/voice";
 import { StatTrio } from "@/components/stat-trio";
 import { ProgressRing } from "@/components/progress-ring";
 import { BadgeChip } from "@/components/badge-chip";
+import { NavHeader } from "@/components/nav-header";
 
 const AREAS = ["Velachery", "Adyar", "T. Nagar", "Guindy", "Besant Nagar", "Anna Nagar", "Mylapore", "Tambaram"];
 type College = { id: string; name: string };
@@ -112,9 +111,7 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-4 px-4 py-4">
-      <Link href="/" className="t-label flex items-center gap-1 text-muted">
-        <ArrowLeft size={16} /> Home
-      </Link>
+      <NavHeader title="Profile" back={{ href: "/", label: "Home" }} />
 
       {/* Editable identity */}
       <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5 shadow-card">
