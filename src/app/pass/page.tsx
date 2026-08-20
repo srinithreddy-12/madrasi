@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { motion } from "motion/react";
 import { supabase } from "@/lib/supabase/client";
 import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
 import { loadProgress, type Progress } from "@/lib/progress";
-import { deriveBadges, type DerivedBadge } from "@/lib/badges";
+import { deriveBadges } from "@/lib/badges";
 import { inr, levelFromXp } from "@/lib/format";
-import { MODULES } from "@/lib/modules";
-import { StampMeter } from "@/components/stamp-meter";
-import { SectionBar } from "@/components/section-bar";
+import { MODULES, MODULE_BY_KEY, type ModuleKey } from "@/lib/modules";
+import { StatTrio } from "@/components/stat-trio";
+import { ProgressRing } from "@/components/progress-ring";
+import { CountUp } from "@/components/count-up";
+import { BadgeChip } from "@/components/badge-chip";
 
 type LedgerRow = {
   id: string;
@@ -20,6 +20,20 @@ type LedgerRow = {
   created_at: string;
 };
 
+// Which module colour each badge wears.
+const BADGE_MODULE: Record<string, ModuleKey> = {
+  issued: "speak",
+  mess: "eat",
+  tamil: "speak",
+  meter: "move",
+  k1: "live",
+  run3: "explore",
+  foodmap: "eat",
+  fluent: "speak",
+  settled: "live",
+  wander: "explore",
+};
+
 export default function PassPage() {
   const { session, loading } = useSupabaseAuth();
   const userId = session?.user.id ?? null;
@@ -27,7 +41,6 @@ export default function PassPage() {
   const [progress, setProgress] = useState<Progress | null>(null);
   const [college, setCollege] = useState<string | null>(null);
   const [ledger, setLedger] = useState<LedgerRow[]>([]);
-  const [flipped, setFlipped] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -35,11 +48,7 @@ export default function PassPage() {
       const prog = await loadProgress(userId);
       setProgress(prog);
       if (prog.profile?.college_id) {
-        const { data } = await supabase
-          .from("colleges")
-          .select("name")
-          .eq("id", prog.profile.college_id)
-          .maybeSingle();
+        const { data } = await supabase.from("colleges").select("name").eq("id", prog.profile.college_id).maybeSingle();
         setCollege(data?.name ?? null);
       }
       const { data: rows } = await supabase
@@ -52,7 +61,7 @@ export default function PassPage() {
   }, [userId]);
 
   if (loading || !progress) {
-    return <div className="bg-ink px-4 py-3 label text-label text-amber">LOADING YOUR PASS…</div>;
+    return <div className="px-4 py-6 t-body text-muted">Loading your pass…</div>;
   }
 
   const { axes, totalXp, savingsTotal, profile } = progress;
@@ -61,109 +70,73 @@ export default function PassPage() {
   const earned = badges.filter((b) => b.isEarned).length;
 
   return (
-    <div className="flex flex-col">
-      {/* Ink header band */}
-      <div className="flex items-center justify-between bg-ink px-4 pb-3 pt-3">
-        <h1 className="signage-xl text-display text-manila">THE PASS</h1>
-        <Link href="/" className="label text-label text-amber">← HOME</Link>
+    <div className="flex flex-col gap-3 px-4 py-4">
+      <div>
+        <h1 className="t-hero text-ink">{profile?.display_name ?? "Your"} pass</h1>
+        <p className="t-label text-muted">
+          {(college ?? "No college").toString()} · {profile?.area ?? "—"}
+        </p>
       </div>
 
-      {/* The flipping pass card (manila band) */}
-      <div className="bg-manila px-4 py-4">
-        <div style={{ perspective: 1200 }}>
-          <motion.div
-            animate={{ rotateY: flipped ? 180 : 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            style={{ transformStyle: "preserve-3d", position: "relative" }}
-          >
-            {/* FRONT */}
-            <div style={{ backfaceVisibility: "hidden" }}>
-              <div className="border-2 border-ink bg-paper p-4 shadow-[6px_6px_0_0_var(--ink)]">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="label text-micro text-faded">MADRASI · CHENNAI</p>
-                    <p className="signage text-title text-ink">{profile?.display_name ?? "Student"}</p>
-                    <p className="label text-micro text-faded">
-                      {(college ?? "No college").toUpperCase()} · {(profile?.area ?? "—").toUpperCase()}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="label text-micro text-faded">LEVEL</p>
-                    <p className="signage-xl text-hero leading-none text-mtc">{level}</p>
-                  </div>
-                </div>
-                <div className="mt-4 grid grid-cols-5 gap-1">
-                  {MODULES.map((m) => (
-                    <StampMeter key={m.key} axis={m.key} value={axes[m.key]} size={60} />
-                  ))}
-                </div>
-              </div>
-            </div>
+      <StatTrio
+        items={[
+          { value: level, label: "Level" },
+          { value: totalXp, label: "XP" },
+          { value: profile?.streak ?? 0, label: "Day streak" },
+        ]}
+      />
 
-            {/* BACK */}
-            <div
-              style={{
-                backfaceVisibility: "hidden",
-                transform: "rotateY(180deg)",
-                position: "absolute",
-                inset: 0,
-              }}
-            >
-              <div className="h-full border-2 border-ink bg-ink p-4 shadow-[6px_6px_0_0_var(--ink)]">
-                <p className="label text-micro text-amber">BADGES · {earned}/{badges.length}</p>
-                <div className="mt-3 grid grid-cols-4 gap-2">
-                  {badges.map((b) => (
-                    <BadgeHole key={b.id} badge={b} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
+      {/* Five progress rings — the five-axis system */}
+      <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+        <p className="t-micro text-muted">Your five routes</p>
+        <div className="mt-4 flex justify-between">
+          {MODULES.map((m, i) => (
+            <ProgressRing key={m.key} value={axes[m.key]} color={m.cssVar} caption={m.label} delayMs={i * 80} />
+          ))}
         </div>
-
-        <button
-          onClick={() => setFlipped((f) => !f)}
-          className="label mx-auto mt-3 block border-2 border-ink/25 px-4 py-1.5 text-micro text-faded"
-        >
-          {flipped ? "SHOW STAMPS ⟲" : "SHOW BADGES ⟲"}
-        </button>
       </div>
 
-      {/* Savings Wallet */}
-      <SectionBar>Savings Wallet · {inr(savingsTotal)}</SectionBar>
-      <ul className="flex flex-col gap-2 bg-manila py-2">
-        {ledger.length === 0 ? (
-          <li className="px-4 text-body text-faded">No savings logged yet.</li>
-        ) : (
-          ledger.map((row) => (
-            <li key={row.id} className="flex items-center justify-between border-l-4 border-mtc bg-paper px-4 py-3">
-              <div>
-                <p className="text-body text-ink">{row.note ?? "Saved"}</p>
-                <p className="label text-micro text-faded">VS {row.baseline_source}</p>
-              </div>
-              <span className="tabular text-fare text-mtc">+{inr(row.amount_saved)}</span>
-            </li>
-          ))
-        )}
-      </ul>
-    </div>
-  );
-}
+      {/* Savings wallet */}
+      <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+        <p className="t-micro text-muted">Savings wallet</p>
+        <CountUp value={savingsTotal} format={(n) => inr(n)} className="t-stat block text-live" />
+        <ul className="mt-4 flex flex-col gap-2">
+          {ledger.length === 0 ? (
+            <li className="t-label text-muted">No savings logged yet.</li>
+          ) : (
+            ledger.map((row) => (
+              <li key={row.id} className="flex items-center justify-between rounded-inner bg-live-tint px-3 py-2">
+                <div className="min-w-0">
+                  <p className="t-label truncate text-ink">{row.note ?? "Saved"}</p>
+                  <p className="t-micro text-muted">vs {row.baseline_source}</p>
+                </div>
+                <span className="t-subtitle shrink-0 text-live">+{inr(row.amount_saved)}</span>
+              </li>
+            ))
+          )}
+        </ul>
+      </div>
 
-function BadgeHole({ badge }: { badge: DerivedBadge }) {
-  return (
-    <div className="flex flex-col items-center gap-1" title={badge.hint}>
-      <span
-        aria-hidden="true"
-        className={`flex h-11 w-11 items-center justify-center rounded-full border-2 ${
-          badge.isEarned ? "border-amber bg-amber/20 text-amber" : "border-manila/20 text-manila/20"
-        }`}
-      >
-        {badge.isEarned ? "●" : "○"}
-      </span>
-      <span className={`label text-center text-[0.5rem] leading-tight ${badge.isEarned ? "text-manila/80" : "text-manila/35"}`}>
-        {badge.label}
-      </span>
+      {/* Badges */}
+      <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+        <p className="t-subtitle text-ink">
+          Badges <span className="text-muted">{earned}/{badges.length}</span>
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {badges.map((b) => {
+            const m = MODULE_BY_KEY[BADGE_MODULE[b.id] ?? "speak"];
+            return (
+              <BadgeChip
+                key={b.id}
+                label={b.label}
+                unlocked={b.isEarned}
+                fillClass={m.bgClass}
+                onColorClass={m.onColorClass}
+              />
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

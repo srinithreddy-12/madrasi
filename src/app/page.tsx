@@ -2,36 +2,38 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
 import { loadProgress, type Progress } from "@/lib/progress";
 import { MODULES } from "@/lib/modules";
+import { inr, levelFromXp } from "@/lib/format";
 import type { Quest } from "@/lib/types";
-import { LedBoard } from "@/components/led-board";
-import { ConductorPunch } from "@/components/conductor-punch";
-import { SectionBar } from "@/components/section-bar";
+import { GreetingRow } from "@/components/greeting-row";
+import { StatTrio } from "@/components/stat-trio";
+import { ModuleBlock } from "@/components/module-block";
+import { CountUp } from "@/components/count-up";
 
-function boardLines(area: string): string[] {
-  const h = new Date().getHours();
-  const meal =
-    h < 11 ? "BREAKFAST" : h < 16 ? "LUNCH" : h < 21 ? "DINNER" : "LATE NIGHT";
-  return [
-    `${meal} UNDER ₹100 · ${area.toUpperCase()}`,
-    "MESS OPEN NOW · 3 NEARBY",
-    "LAST BUS 23C · 11:15 PM",
-    "SHARE AUTO TO GUINDY · ₹20",
-  ];
-}
+const BLURBS: Record<string, string> = {
+  eat: "Mess, tiffin & late-night eats",
+  speak: "Survive Chennai in Tamil",
+  move: "Autos, buses & metro — fair fares",
+  live: "Laundry & student services",
+  explore: "Places, plans & weekend trips",
+};
+
+const QUICK_CHIPS = [
+  { label: "Under ₹100", href: "/eat?cap=100" },
+  { label: "Mess plans", href: "/eat" },
+  { label: "Late night", href: "/eat" },
+  { label: "Fare Shield", href: "/fare-shield" },
+];
 
 export default function HomePage() {
   const { session, loading } = useSupabaseAuth();
-  const router = useRouter();
   const [progress, setProgress] = useState<Progress | null>(null);
   const [quest, setQuest] = useState<Quest | null>(null);
   const [doneSteps, setDoneSteps] = useState<number[]>([]);
-  const [punch, setPunch] = useState(0);
-  const [punchLabel, setPunchLabel] = useState("PUNCHED");
   const [busy, setBusy] = useState(false);
 
   const userId = session?.user.id ?? null;
@@ -50,9 +52,7 @@ export default function HomePage() {
         setQuest(active);
         setDoneSteps(
           active
-            ? (progRes.data ?? [])
-                .filter((r) => r.quest_id === active.id)
-                .map((r) => r.step_index)
+            ? (progRes.data ?? []).filter((r) => r.quest_id === active.id).map((r) => r.step_index)
             : [],
         );
       },
@@ -63,157 +63,104 @@ export default function HomePage() {
     if (userId) void refresh(userId);
   }, [userId, refresh]);
 
-  const area = progress?.profile?.area ?? "Velachery";
-  const lines = useMemo(() => boardLines(area), [area]);
+  const name = progress?.profile?.display_name ?? "there";
+  const level = levelFromXp(progress?.totalXp ?? 0);
   const activeStepIndex = doneSteps.length;
   const activeStep = quest?.steps[activeStepIndex] ?? null;
-
-  function runSearch(query: string) {
-    const rupee = query.match(/₹?\s?(\d{2,5})/);
-    const params = new URLSearchParams();
-    if (rupee) params.set("cap", rupee[1]);
-    if (query.trim()) params.set("q", query.trim());
-    router.push(`/eat${params.toString() ? `?${params}` : ""}`);
-  }
 
   async function punchIt() {
     if (!userId || !quest || !activeStep || busy) return;
     setBusy(true);
-    const [progInsert, xpInsert] = await Promise.all([
-      supabase.from("quest_progress").insert({
-        user_id: userId,
-        quest_id: quest.id,
-        step_index: activeStepIndex,
-      }),
-      supabase.from("xp_events").insert({
-        user_id: userId,
-        axis: activeStep.axis,
-        amount: activeStep.xp,
-        source: `quest:${quest.id}`,
-      }),
+    const [p, x] = await Promise.all([
+      supabase.from("quest_progress").insert({ user_id: userId, quest_id: quest.id, step_index: activeStepIndex }),
+      supabase.from("xp_events").insert({ user_id: userId, axis: activeStep.axis, amount: activeStep.xp, source: `quest:${quest.id}` }),
     ]);
-    if (!progInsert.error && !xpInsert.error) {
-      setPunchLabel(`+${activeStep.xp} ${activeStep.axis.toUpperCase()}`);
-      setPunch((n) => n + 1);
-      await refresh(userId);
-    }
+    if (!p.error && !x.error) await refresh(userId);
     setBusy(false);
   }
 
   return (
-    <div className="flex flex-col">
-      {/* Ink band — identity + LED destination board */}
-      <div className="bg-ink">
-        <div className="flex items-start justify-between px-4 pb-1 pt-3">
-          <div>
-            <p className="label text-micro text-amber">CHENNAI</p>
-            <h1 className="signage-xl text-display text-manila">MADRASI</h1>
-          </div>
-          <Link
-            href="/pass"
-            className="label mt-1 border border-amber px-3 py-1 text-label text-amber"
-          >
-            PASS →
+    <div className="flex flex-col gap-3 px-4 py-4">
+      <GreetingRow
+        name={name}
+        right={
+          <Link href="/pass" className="t-chip flex h-9 items-center gap-1 rounded-full bg-speak px-4 text-white">
+            Pass <ArrowRight size={14} />
           </Link>
-        </div>
-        <LedBoard marquee="DESTINATION" lines={lines} onActivate={runSearch} />
-      </div>
+        }
+      />
 
-      {/* Manila band — search */}
-      <SectionBar>Search</SectionBar>
-      <div className="bg-manila px-4 py-4">
-        <SearchStub onSearch={runSearch} />
-      </div>
+      <StatTrio
+        items={[
+          { value: level, label: "Level" },
+          { value: progress?.totalXp ?? 0, label: "XP" },
+          { value: progress?.profile?.streak ?? 0, label: "Day streak" },
+        ]}
+      />
 
-      {/* Green band — Fare Shield, two taps from Home */}
-      <Link href="/fare-shield" className="flex items-center justify-between bg-mtc px-4 py-4 active:scale-[0.99] [transition-duration:120ms]">
-        <span className="signage text-title text-manila">Fare Shield</span>
-        <span className="label text-label text-manila/80">DON&apos;T GET OVERCHARGED →</span>
-      </Link>
-
-      {/* Manila band — Today's Punch, one thing */}
-      <SectionBar>Today&apos;s Punch</SectionBar>
-      <div className="bg-manila px-4 py-4">
+      {/* Today's Punch — a --live block with a white pill CTA */}
+      <div className="rounded-block bg-live p-5 text-white">
+        <p className="t-micro opacity-70">
+          Today&apos;s Punch{quest ? ` · ${quest.title}` : ""}
+        </p>
         {loading || !progress ? (
-          <p className="label text-label text-faded">Loading…</p>
+          <p className="t-title mt-2">Loading…</p>
         ) : !quest ? (
-          <p className="text-body text-faded">
-            No active quest. Seed quests to enable Today&apos;s Punch.
-          </p>
+          <p className="t-body mt-2 opacity-80">Seed quests to enable Today&apos;s Punch.</p>
         ) : activeStep ? (
-          <div className="flex flex-col gap-3">
-            <p className="label text-micro text-faded">
-              {quest.title} · STEP {activeStepIndex + 1}/{quest.steps.length}
-            </p>
-            <p className="signage text-display text-ink">{activeStep.label}</p>
-            <button
-              type="button"
-              onClick={punchIt}
-              disabled={busy}
-              className="signage self-start bg-stamp px-6 py-3 text-title text-manila active:scale-[0.99] disabled:opacity-60 [transition-duration:120ms]"
-            >
-              Punch it
-            </button>
-          </div>
+          <>
+            <p className="t-title mt-2">{activeStep.label}</p>
+            <div className="mt-4 flex items-center justify-between">
+              <span className="t-label opacity-80">
+                Step {activeStepIndex + 1} / {quest.steps.length} · +{activeStep.xp} XP
+              </span>
+              <button
+                type="button"
+                onClick={punchIt}
+                disabled={busy}
+                className="t-subtitle rounded-full bg-white px-5 py-2.5 text-live [transition:transform_120ms_ease-out] active:scale-[0.98] disabled:opacity-60"
+              >
+                Punch it
+              </button>
+            </div>
+          </>
         ) : (
-          <p className="text-body text-mtc">Quest complete — every step punched. ✓</p>
+          <p className="t-title mt-2">All punched ✓</p>
         )}
       </div>
 
-      {/* Ink band — route strip */}
-      <SectionBar>Your Routes</SectionBar>
-      <div className="flex gap-2 overflow-x-auto bg-ink px-4 py-4">
-        {MODULES.map((m) => {
-          const fill = progress?.axes[m.key] ?? 0;
-          return (
-            <Link
-              key={m.key}
-              href={m.path}
-              className="flex min-w-[108px] shrink-0 flex-col gap-2"
-            >
-              <div className="flex items-center justify-between">
-                <span className="tabular text-label text-amber">{m.routeCode}</span>
-                <span className="tabular text-micro text-manila/50">{fill}</span>
-              </div>
-              <span className="signage text-title text-manila">{m.label}</span>
-              <span aria-hidden="true" className="h-1.5 bg-manila/15">
-                <span className="block h-1.5 bg-amber" style={{ width: `${fill}%` }} />
-              </span>
-            </Link>
-          );
-        })}
+      {/* Quick chips */}
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {QUICK_CHIPS.map((c) => (
+          <Link
+            key={c.label}
+            href={c.href}
+            className="t-chip flex h-[34px] shrink-0 items-center whitespace-nowrap rounded-full border border-line bg-surface px-3.5 text-ink"
+          >
+            {c.label}
+          </Link>
+        ))}
       </div>
 
-      <ConductorPunch trigger={punch} label={punchLabel} />
-    </div>
-  );
-}
-
-function SearchStub({ onSearch }: { onSearch: (q: string) => void }) {
-  const [value, setValue] = useState("");
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSearch(value);
-      }}
-      className="flex flex-col gap-1"
-    >
-      <label htmlFor="home-search" className="label text-micro text-faded">
-        Search
-      </label>
-      <div className="flex overflow-hidden border-2 border-ink bg-paper">
-        <input
-          id="home-search"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="₹100 biryani · laundry near me · bus to T Nagar"
-          className="min-w-0 flex-1 bg-transparent px-3 py-3 text-body text-ink placeholder:text-faded/70 focus:outline-none"
+      {/* Five module blocks */}
+      {MODULES.map((m) => (
+        <ModuleBlock
+          key={m.key}
+          module={m}
+          blurb={BLURBS[m.key]}
+          progress={`${progress?.axes[m.key] ?? 0}%`}
         />
-        <button type="submit" className="signage bg-mtc px-4 text-title text-manila">
-          Go
-        </button>
+      ))}
+
+      {/* Savings card */}
+      <div className="rounded-card border border-line bg-surface p-5 shadow-card">
+        <p className="t-micro text-muted">Saved this month</p>
+        <CountUp
+          value={progress?.savingsTotal ?? 0}
+          format={(n) => inr(n)}
+          className="t-stat mt-1 block text-live"
+        />
       </div>
-    </form>
+    </div>
   );
 }

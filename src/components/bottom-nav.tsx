@@ -4,46 +4,36 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MODULES } from "@/lib/modules";
 
-/**
- * The five word-labelled module tabs (STYLE-v1.1 §5): ink background, 64px tall,
- * no radius. Route code above the word, both DM Mono. Active tab gets a 3px
- * amber top border and amber text; inactive labels are lightened manila for ink.
- * The whole tab is a ≥44×44 touch target regardless of the visible label size.
- */
+// STYLE-v2 §4: white, 64px, --line top border, block radius on the top corners.
+// Icon above word. Active: glyph in a 36px module-colour circle + --ink label.
+// Inactive: --muted. 44×44 minimum touch target (the whole cell).
 export function BottomNav() {
   const pathname = usePathname();
 
   return (
     <nav
       aria-label="Modules"
-      className="sticky bottom-0 z-30 bg-ink pb-[env(safe-area-inset-bottom)]"
+      className="sticky bottom-0 z-30 rounded-t-[28px] border-t border-line bg-surface pb-[env(safe-area-inset-bottom)]"
     >
-      <ul className="mx-auto flex max-w-[420px] items-stretch">
+      <ul className="mx-auto flex max-w-[440px] items-stretch">
         {MODULES.map((m) => {
           const active = pathname === m.path || pathname.startsWith(`${m.path}/`);
+          const Icon = m.icon;
           return (
             <li key={m.key} className="flex-1">
               <Link
                 href={m.path}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-16 flex-col items-center justify-center gap-0.5 border-t-[3px] px-1 ${
-                  active ? "border-amber" : "border-transparent"
-                }`}
+                className="flex min-h-16 flex-col items-center justify-center gap-1 px-1"
               >
                 <span
-                  className={`tabular text-micro leading-none ${
-                    active ? "text-amber" : "text-manila/55"
+                  className={`flex h-9 w-9 items-center justify-center rounded-full ${
+                    active ? m.bgClass : ""
                   }`}
                 >
-                  {m.routeCode}
+                  <Icon size={20} strokeWidth={2} className={active ? m.onColorClass : "text-muted"} />
                 </span>
-                <span
-                  className={`label text-micro leading-none ${
-                    active ? "text-amber" : "text-manila/55"
-                  }`}
-                >
-                  {m.label}
-                </span>
+                <span className={`t-micro ${active ? "text-ink" : "text-muted"}`}>{m.label}</span>
               </Link>
             </li>
           );
