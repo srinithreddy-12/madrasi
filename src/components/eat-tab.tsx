@@ -8,9 +8,13 @@ import type { FoodPlace } from "@/lib/types";
 import { MODULE_BY_KEY } from "@/lib/modules";
 import { inr } from "@/lib/format";
 import { awardFirstSaveXp } from "@/lib/xp";
+import { MENUS } from "@/lib/menus";
 import { ContentCard } from "@/components/content-card";
 import { FilterChips, type Chip } from "@/components/filter-chips";
 import { DetailSheet } from "@/components/detail-sheet";
+
+const cuisineLabel = (c: FoodPlace["cuisine"]) =>
+  c === "veg" ? "Vegetarian" : c === "nonveg" ? "Non-vegetarian" : "Veg & non-veg";
 
 const EAT = MODULE_BY_KEY.eat;
 const TABS: Chip[] = [
@@ -135,8 +139,18 @@ export function EatTab() {
             {isMess(detail) && detail.monthly_price && (
               <p className="t-label text-muted">≈ {inr(Math.round(detail.monthly_price / 90))}/meal</p>
             )}
-            {detail.must_try.length > 0 && (
+
+            {detail.tags.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
+                {detail.tags.map((t) => (
+                  <span key={t} className="t-micro rounded-full border border-line px-2.5 py-1 text-muted">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            )}
+            {detail.must_try.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
                 {detail.must_try.map((t) => (
                   <span key={t} className="t-chip rounded-full bg-eat-tint px-3 py-1 text-ink">
                     {t}
@@ -145,7 +159,22 @@ export function EatTab() {
               </div>
             )}
             {detail.blurb && <p className="t-body mt-3 text-ink">{detail.blurb}</p>}
-            <div className="mt-3 grid grid-cols-2 gap-2">
+
+            {MENUS[detail.id]?.length > 0 && (
+              <div className="mt-4">
+                <p className="t-label mb-2 text-muted">Menu</p>
+                <div className="divide-y divide-line rounded-inner border border-line">
+                  {MENUS[detail.id].map((item) => (
+                    <div key={item.name} className="flex items-center justify-between px-3 py-2.5">
+                      <span className="t-body text-ink">{item.name}</span>
+                      <span className="t-label text-eat">{inr(item.price)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-4 grid grid-cols-2 gap-2">
               <div className="rounded-inner bg-eat-tint px-3 py-2">
                 <p className="t-micro text-muted">Timings</p>
                 <p className="t-label text-ink">{detail.timings}</p>
@@ -153,6 +182,22 @@ export function EatTab() {
               <div className="rounded-inner bg-eat-tint px-3 py-2">
                 <p className="t-micro text-muted">Rating</p>
                 <p className="t-label text-ink">{detail.rating}★ · {detail.reviews}</p>
+              </div>
+              <div className="rounded-inner bg-eat-tint px-3 py-2">
+                <p className="t-micro text-muted">Distance</p>
+                <p className="t-label text-ink">{detail.distance_km} km</p>
+              </div>
+              <div className="rounded-inner bg-eat-tint px-3 py-2">
+                <p className="t-micro text-muted">Cuisine</p>
+                <p className="t-label text-ink">{cuisineLabel(detail.cuisine)}</p>
+              </div>
+              <div className="rounded-inner bg-eat-tint px-3 py-2">
+                <p className="t-micro text-muted">Delivery</p>
+                <p className="t-label text-ink">{detail.delivery ? "Available" : "Not available"}</p>
+              </div>
+              <div className="rounded-inner bg-eat-tint px-3 py-2">
+                <p className="t-micro text-muted">Late night</p>
+                <p className="t-label text-ink">{detail.late_night ? "Yes" : "No"}</p>
               </div>
             </div>
           </>
@@ -163,12 +208,11 @@ export function EatTab() {
 }
 
 function VegDot({ cuisine }: { cuisine: FoodPlace["cuisine"] }) {
-  const label = cuisine === "veg" ? "Vegetarian" : cuisine === "nonveg" ? "Non-vegetarian" : "Veg & non-veg";
   const color = cuisine === "veg" ? "var(--speak)" : cuisine === "nonveg" ? "var(--live)" : "var(--eat)";
   return (
     <span className="t-micro flex items-center gap-1.5 text-muted">
       <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
-      {label}
+      {cuisineLabel(cuisine)}
     </span>
   );
 }
