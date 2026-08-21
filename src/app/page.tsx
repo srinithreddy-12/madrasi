@@ -107,7 +107,6 @@ export default function HomePage() {
               See all
             </Link>
           </div>
-          <p className="t-caption text-muted">Cheap places students actually eat at, closest first.</p>
         </div>
         <div className="-mx-3.5 flex gap-2 overflow-x-auto px-3.5 pb-1">
           {cheap.map((f) => (
@@ -136,9 +135,6 @@ export default function HomePage() {
                 See all
               </Link>
             </div>
-            <p className="t-caption text-muted">
-              Starter kits shipped to your hostel — cheaper than buying each thing separately.
-            </p>
           </div>
           <div className="-mx-3.5 flex gap-2 overflow-x-auto px-3.5 pb-1">
             {bundles.map((b) => (
@@ -171,7 +167,6 @@ export default function HomePage() {
         <section className="flex flex-col gap-2">
           <div>
             <h2 className="t-title text-ink">Worth going this week</h2>
-            <p className="t-caption text-muted">A place near you that costs little or nothing.</p>
           </div>
           <div className="flex flex-col gap-2 rounded-block bg-explore-tint p-card">
             <div>
