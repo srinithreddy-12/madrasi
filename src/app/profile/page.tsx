@@ -11,6 +11,7 @@ import { MODULES, MODULE_BY_KEY, type ModuleKey } from "@/lib/modules";
 import { deriveBadges } from "@/lib/badges";
 import { circleId } from "@/lib/circle-id";
 import { AVATAR_EMOJIS, getAvatar, setAvatar as saveAvatar } from "@/lib/avatars";
+import { getBudget, getTamilLevel, getInterests } from "@/lib/onboarding";
 import type { CollegeLeaderboardRow } from "@/lib/types";
 import { resetDemoData } from "@/lib/demo";
 import { soundEnabled } from "@/lib/voice";
@@ -75,10 +76,17 @@ export default function ProfilePage() {
   const [accountPassword, setAccountPassword] = useState("");
   const [accountStatus, setAccountStatus] = useState<"idle" | "saving" | "sent" | "error">("idle");
   const [accountError, setAccountError] = useState("");
+  const [budget, setBudgetDisplay] = useState<string | null>(null);
+  const [tamilLevel, setTamilLevelDisplay] = useState<string | null>(null);
+  const [interests, setInterestsDisplay] = useState<string[]>([]);
 
   useEffect(() => setSound(soundEnabled()), []);
   useEffect(() => {
-    if (userId) setAvatarState(getAvatar(userId));
+    if (!userId) return;
+    setAvatarState(getAvatar(userId));
+    setBudgetDisplay(getBudget(userId));
+    setTamilLevelDisplay(getTamilLevel(userId));
+    setInterestsDisplay(getInterests(userId));
   }, [userId]);
 
   function pickAvatar(emoji: string) {
@@ -282,6 +290,23 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Onboarding-quiz answers with no profiles column yet — local only */}
+      {(budget || tamilLevel || interests.length > 0) && (
+        <div className="flex flex-col gap-2 rounded-card border border-line bg-surface p-card shadow-card">
+          <div className="flex items-center justify-between">
+            <p className="t-label text-muted">Your vibe</p>
+            <Link href="/onboarding" className="t-micro text-speak">Retake quiz</Link>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {budget && <span className="t-chip rounded-full bg-move-tint px-3 py-1 text-move">{budget}</span>}
+            {tamilLevel && <span className="t-chip rounded-full bg-speak-tint px-3 py-1 text-speak">{tamilLevel}</span>}
+            {interests.map((i) => (
+              <span key={i} className="t-chip rounded-full bg-explore-tint px-3 py-1 text-explore">{i}</span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Stats + rings */}
       <StatTrio

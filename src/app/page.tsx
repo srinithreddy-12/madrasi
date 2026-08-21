@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, MapPin } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
@@ -10,6 +11,7 @@ import { MODULES } from "@/lib/modules";
 import { inr, levelFromXp } from "@/lib/format";
 import type { Bundle, FoodPlace } from "@/lib/types";
 import { getAvatar } from "@/lib/avatars";
+import { isOnboarded } from "@/lib/onboarding";
 import { GreetingRow } from "@/components/greeting-row";
 import { StatTrio } from "@/components/stat-trio";
 import { ModuleTile } from "@/components/module-tile";
@@ -33,6 +35,7 @@ const mapsLink = (name: string, area: string) =>
   `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${name}, ${area}, Chennai`)}`;
 
 export default function HomePage() {
+  const router = useRouter();
   const { session } = useSupabaseAuth();
   const userId = session?.user.id ?? null;
 
@@ -64,6 +67,10 @@ export default function HomePage() {
   useEffect(() => {
     if (userId) void loadProgress(userId).then(setProgress);
   }, [userId]);
+
+  useEffect(() => {
+    if (userId && !isOnboarded(userId)) router.replace("/onboarding");
+  }, [userId, router]);
 
   const name = progress?.profile?.display_name ?? "there";
   const level = levelFromXp(progress?.totalXp ?? 0);
