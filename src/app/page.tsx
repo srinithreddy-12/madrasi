@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowRight, MapPin } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useSupabaseAuth } from "@/lib/supabase/auth-provider";
 import { loadProgress, type Progress } from "@/lib/progress";
 import { MODULES } from "@/lib/modules";
-import { inr, levelFromXp } from "@/lib/format";
+import { inr } from "@/lib/format";
 import type { Bundle, FoodPlace } from "@/lib/types";
 import { getAvatar } from "@/lib/avatars";
 import { isOnboarded } from "@/lib/onboarding";
@@ -24,12 +25,10 @@ type Place = {
   category: string;
 };
 
-// One plain line per module row (CLARITY §"five module rows on Home").
-const ROW_BLURBS: Record<string, string> = {
-  speak: "Type English, hear it spoken in Tamil",
-  move: "Compare what a bus, metro, auto and cab each cost",
-  live: "Laundry by the kilo, and starter kits for your room",
-  explore: "Beaches, temples and outings that fit a student budget",
+// Only the Tamil card carries a one-line subtitle; the other three show just
+// the module name.
+const CARD_SUBTITLES: Record<string, string> = {
+  speak: "Translate to Tamil",
 };
 
 const mapsLink = (name: string, area: string) =>
@@ -72,7 +71,6 @@ export default function HomePage() {
   }, [userId, router]);
 
   const name = progress?.profile?.display_name ?? "there";
-  const level = levelFromXp(progress?.totalXp ?? 0);
 
   return (
     <div className="screen gap-2">
@@ -86,15 +84,10 @@ export default function HomePage() {
         }
       />
 
-      {/* The only game number on Home — a quiet line to the full scoreboard. */}
-      <Link href="/profile" className="t-label -mt-1 w-fit text-muted">
-        Level {level} · {progress?.profile?.streak ?? 0}-day streak
-      </Link>
-
-      {/* Module rows — Eat lives inside Services now, no standalone /eat page */}
-      <div className="mt-1 flex flex-col gap-2">
+      {/* Module cards — Eat lives inside Services now, no standalone /eat page */}
+      <div className="mt-1 grid grid-cols-2 gap-2">
         {MODULES.filter((m) => m.key !== "eat").map((m) => (
-          <ModuleTile key={m.key} module={m} subtitle={ROW_BLURBS[m.key]} />
+          <ModuleTile key={m.key} module={m} subtitle={CARD_SUBTITLES[m.key]} />
         ))}
       </div>
 
@@ -168,21 +161,32 @@ export default function HomePage() {
           <div>
             <h2 className="t-title text-ink">Worth going this week</h2>
           </div>
-          <div className="flex flex-col gap-2 rounded-block bg-explore-tint p-card">
-            <div>
-              <p className="t-subtitle text-ink">{pick.name}</p>
-              <p className="t-label text-muted">
-                {pick.category} · {pick.area} · {pick.entry === 0 ? "Free entry" : inr(pick.entry)}
-              </p>
+          <div className="overflow-hidden rounded-block bg-explore-tint">
+            <div className="relative h-36 w-full">
+              <Image
+                src={`/explore/${pick.id}.jpg`}
+                alt={pick.name}
+                fill
+                sizes="440px"
+                className="object-cover"
+              />
             </div>
-            <a
-              href={mapsLink(pick.name, pick.area)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="t-subtitle flex items-center justify-center gap-2 rounded-full bg-explore py-3 text-white"
-            >
-              <MapPin size={18} /> Open in Maps
-            </a>
+            <div className="flex flex-col gap-2 p-card">
+              <div>
+                <p className="t-subtitle text-ink">{pick.name}</p>
+                <p className="t-label text-muted">
+                  {pick.category} · {pick.area} · {pick.entry === 0 ? "Free entry" : inr(pick.entry)}
+                </p>
+              </div>
+              <a
+                href={mapsLink(pick.name, pick.area)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="t-subtitle flex items-center justify-center gap-2 rounded-full bg-explore py-3 text-white"
+              >
+                <MapPin size={18} /> Open in Maps
+              </a>
+            </div>
           </div>
         </section>
       )}
